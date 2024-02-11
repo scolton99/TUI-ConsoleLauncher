@@ -1129,6 +1129,19 @@ public class UIManager implements OnTouchListener {
                     labelViews[count].setVerticalScrollBarEnabled(false);
                 }
 
+                if (count == labelIndexes[Label.weather.ordinal()]) {
+                    labelViews[count].setOnTouchListener(new View.OnTouchListener() {
+                        @Override
+                        public boolean onTouch(View view, MotionEvent motionEvent) {
+                            Intent intent = new Intent();
+                            ComponentName name = new ComponentName("com.google.android.googlequicksearchbox", "com.google.android.apps.search.weather.WeatherExportedActivity");
+                            intent.setComponent(name);
+                            context.startActivity(intent);
+                            return true;
+                        }
+                    });
+                }
+
                 applyBgRect(labelViews[count], bgRectColors[count], bgColors[count], margins[0], strokeWidth, cornerRadius);
                 applyShadow(labelViews[count], outlineColors[count], shadowXOffset, shadowYOffset, shadowRadius);
             } else {

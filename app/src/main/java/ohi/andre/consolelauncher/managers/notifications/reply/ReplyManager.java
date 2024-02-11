@@ -275,7 +275,12 @@ public class ReplyManager implements XMLPrefsElement {
         NotificationWear notificationWear = new NotificationWear();
 
         Notification.WearableExtender wearableExtender = new Notification.WearableExtender(statusBarNotification.getNotification());
-        for(Notification.Action action : wearableExtender.getActions()) {
+
+        List<Notification.Action> allActions = new ArrayList<>();
+        allActions.addAll(Arrays.asList(statusBarNotification.getNotification().actions));
+        allActions.addAll(wearableExtender.getActions());
+
+        for(Notification.Action action : allActions) {
             RemoteInput[] rs = action.getRemoteInputs();
             if(rs != null && rs.length > 0) {
                 notificationWear.remoteInputs = rs;
@@ -304,7 +309,7 @@ public class ReplyManager implements XMLPrefsElement {
     private BoundApp findApp(String pkg) {
         if(boundApps != null) {
             for(BoundApp a : boundApps) {
-                if(a.packageName.equals(pkg)) return a;
+                if(a.packageName.equals(pkg) || a.label.equals(pkg)) return a;
             }
         }
 

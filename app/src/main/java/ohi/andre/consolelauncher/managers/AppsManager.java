@@ -83,7 +83,7 @@ public class AppsManager implements XMLPrefsElement {
 
     private XMLPrefsList prefsList;
 
-    public List<Group> groups;
+    public final List<Group> groups;
 
     private Pattern pp, pl;
     private String appInstalledFormat, appUninstalledFormat;
@@ -286,7 +286,9 @@ public class AppsManager implements XMLPrefsElement {
                                             }
                                         }
 
-                                        groups.add(g);
+                                        synchronized(groups) {
+                                            groups.add(g);
+                                        }
                                     }
                                 }.start();
                             } else {
@@ -377,8 +379,10 @@ public class AppsManager implements XMLPrefsElement {
         AppUtils.checkEquality(hiddenApps);
 
         Group.sorting = XMLPrefsManager.getInt(Apps.app_groups_sorting);
-        for(Group g : groups) g.sort();
-        Collections.sort(groups, (o1, o2) -> Tuils.alphabeticCompare(o1.name(), o2.name()));
+        synchronized(groups) {
+            for(Group g : groups) g.sort();
+            Collections.sort(groups, (o1, o2) -> Tuils.alphabeticCompare(o1.name(), o2.name()));
+        }
     }
 
     private List<LaunchInfo> createAppMap(PackageManager mgr) {
