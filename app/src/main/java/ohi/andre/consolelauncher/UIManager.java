@@ -11,20 +11,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
-import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.GestureDetectorCompat;
-import android.text.SpannableString;
+
+import androidx.annotation.NonNull;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsAnimationCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.core.view.GestureDetectorCompat;
+
+import android.text.Layout;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.util.DisplayMetrics;
@@ -44,13 +48,13 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
@@ -58,7 +62,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import ohi.andre.consolelauncher.commands.main.MainPack;
-import ohi.andre.consolelauncher.commands.main.specific.RedirectCommand;
 import ohi.andre.consolelauncher.managers.HTMLExtractManager;
 import ohi.andre.consolelauncher.managers.NotesManager;
 import ohi.andre.consolelauncher.managers.TerminalManager;
@@ -74,30 +77,27 @@ import ohi.andre.consolelauncher.managers.xml.options.Toolbar;
 import ohi.andre.consolelauncher.managers.xml.options.Ui;
 import ohi.andre.consolelauncher.tuils.AllowEqualsSequence;
 import ohi.andre.consolelauncher.tuils.NetworkUtils;
-import ohi.andre.consolelauncher.tuils.OutlineEditText;
 import ohi.andre.consolelauncher.tuils.OutlineTextView;
 import ohi.andre.consolelauncher.tuils.Tuils;
 import ohi.andre.consolelauncher.tuils.interfaces.CommandExecuter;
 import ohi.andre.consolelauncher.tuils.interfaces.OnBatteryUpdate;
-import ohi.andre.consolelauncher.tuils.interfaces.OnRedirectionListener;
-import ohi.andre.consolelauncher.tuils.interfaces.OnTextChanged;
 import ohi.andre.consolelauncher.tuils.stuff.PolicyReceiver;
 
 public class UIManager implements OnTouchListener {
 
-    public static String ACTION_UPDATE_SUGGESTIONS = BuildConfig.APPLICATION_ID + ".ui_update_suggestions";
-    public static String ACTION_UPDATE_HINT = BuildConfig.APPLICATION_ID + ".ui_update_hint";
-    public static String ACTION_ROOT = BuildConfig.APPLICATION_ID + ".ui_root";
-    public static String ACTION_NOROOT = BuildConfig.APPLICATION_ID + ".ui_noroot";
-    public static String ACTION_LOGTOFILE = BuildConfig.APPLICATION_ID + ".ui_log";
-    public static String ACTION_CLEAR = BuildConfig.APPLICATION_ID + "ui_clear";
-    public static String ACTION_WEATHER = BuildConfig.APPLICATION_ID + "ui_weather";
-    public static String ACTION_WEATHER_GOT_LOCATION = BuildConfig.APPLICATION_ID + "ui_weather_location";
-    public static String ACTION_WEATHER_DELAY = BuildConfig.APPLICATION_ID + "ui_weather_delay";
-    public static String ACTION_WEATHER_MANUAL_UPDATE = BuildConfig.APPLICATION_ID + "ui_weather_update";
+    public static final String ACTION_UPDATE_SUGGESTIONS = BuildConfig.APPLICATION_ID + ".ui_update_suggestions";
+    public static final String ACTION_UPDATE_HINT = BuildConfig.APPLICATION_ID + ".ui_update_hint";
+    public static final String ACTION_ROOT = BuildConfig.APPLICATION_ID + ".ui_root";
+    public static final String ACTION_NOROOT = BuildConfig.APPLICATION_ID + ".ui_noroot";
+    public static final String ACTION_LOGTOFILE = BuildConfig.APPLICATION_ID + ".ui_log";
+    public static final String ACTION_CLEAR = BuildConfig.APPLICATION_ID + "ui_clear";
+    public static final String ACTION_WEATHER = BuildConfig.APPLICATION_ID + "ui_weather";
+    public static final String ACTION_WEATHER_GOT_LOCATION = BuildConfig.APPLICATION_ID + "ui_weather_location";
+    public static final String ACTION_WEATHER_DELAY = BuildConfig.APPLICATION_ID + "ui_weather_delay";
+    public static final String ACTION_WEATHER_MANUAL_UPDATE = BuildConfig.APPLICATION_ID + "ui_weather_update";
 
-    public static String FILE_NAME = "fileName";
-    public static String PREFS_NAME = "ui";
+    public static final String FILE_NAME = "fileName";
+    public static final String PREFS_NAME = "ui";
 
     private enum Label {
         ram,
@@ -115,42 +115,42 @@ public class UIManager implements OnTouchListener {
     private final int TIME_DELAY = 1000;
     private final int STORAGE_DELAY = 60 * 1000;
 
-    protected Context mContext;
+    protected final Context mContext;
 
     private Handler handler;
 
     private DevicePolicyManager policy;
     private ComponentName component;
-    private GestureDetectorCompat gestureDetector;
+    private final GestureDetectorCompat gestureDetector;
 
-    SharedPreferences preferences;
+    final SharedPreferences preferences;
 
-    private InputMethodManager imm;
-    private TerminalManager mTerminalAdapter;
+    private final InputMethodManager imm;
+    private final TerminalManager mTerminalAdapter;
 
     int mediumPercentage, lowPercentage;
     String batteryFormat;
 
     boolean hideToolbarNoInput;
-    View toolbarView;
+    final View toolbarView;
 
     //    never access this directly, use getLabelView
     private TextView[] labelViews = new TextView[Label.values().length];
 
-    private float[] labelIndexes = new float[labelViews.length];
-    private int[] labelSizes = new int[labelViews.length];
-    private CharSequence[] labelTexts = new CharSequence[labelViews.length];
+    private final float[] labelIndexes = new float[labelViews.length];
+    private final int[] labelSizes = new int[labelViews.length];
+    private final CharSequence[] labelTexts = new CharSequence[labelViews.length];
 
     private TextView getLabelView(Label l) {
         return labelViews[(int) labelIndexes[l.ordinal()]];
     }
 
     private int notesMaxLines;
-    private NotesManager notesManager;
+    private final NotesManager notesManager;
     private NotesRunnable notesRunnable;
     private class NotesRunnable implements Runnable {
 
-        int updateTime = 2000;
+        final int updateTime = 2000;
 
         @Override
         public void run() {
@@ -162,9 +162,9 @@ public class UIManager implements OnTouchListener {
                 handler.postDelayed(this, updateTime);
             }
         }
-    };
+    }
 
-    private BatteryUpdate batteryUpdate;
+    private final BatteryUpdate batteryUpdate;
     private class BatteryUpdate implements OnBatteryUpdate {
 
 //        %(charging:not charging)
@@ -224,7 +224,7 @@ public class UIManager implements OnTouchListener {
 
             Matcher m = optionalCharging.matcher(cp);
             while (m.find()) {
-                cp = cp.replace(m.group(0), m.groupCount() == 2 ? m.group(charging ? 1 : 2) : Tuils.EMPTYSTRING);
+                cp = cp.replace(m.group(0), m.groupCount() == 2 ? m.group(charging ? 1 : 2) : Tuils.EMPTY_STRING);
             }
 
             cp = value.matcher(cp).replaceAll(String.valueOf(percentage));
@@ -244,7 +244,7 @@ public class UIManager implements OnTouchListener {
             charging = false;
             update(-1);
         }
-    };
+    }
 
     private StorageRunnable storageRunnable;
     private class StorageRunnable implements Runnable {
@@ -347,7 +347,7 @@ public class UIManager implements OnTouchListener {
 
             handler.postDelayed(this, STORAGE_DELAY);
         }
-    };
+    }
 
     private TimeRunnable timeRunnable;
     private class TimeRunnable implements Runnable {
@@ -363,7 +363,7 @@ public class UIManager implements OnTouchListener {
             updateText(Label.time, TimeManager.instance.getCharSequence(mContext, labelSizes[Label.time.ordinal()], "%t0"));
             handler.postDelayed(this, TIME_DELAY);
         }
-    };
+    }
 
     private ActivityManager.MemoryInfo memory;
     private ActivityManager activityManager;
@@ -429,7 +429,7 @@ public class UIManager implements OnTouchListener {
 
             handler.postDelayed(this, RAM_DELAY);
         }
-    };
+    }
 
     private NetworkRunnable networkRunnable;
     private class NetworkRunnable implements Runnable {
@@ -474,7 +474,10 @@ public class UIManager implements OnTouchListener {
 
         Pattern optionalWifi, optionalData, optionalBluetooth;
 
-        String format, optionalValueSeparator;
+        String format;
+
+        String optionalValueSeparator;
+
         int color;
 
         WifiManager wifiManager;
@@ -563,7 +566,7 @@ public class UIManager implements OnTouchListener {
             copy = w2.matcher(copy).replaceAll(wifiOn ? ON : OFF);
             copy = w3.matcher(copy).replaceAll(wifiOn ? _true : _false);
             copy = w4.matcher(copy).replaceAll(wifiOn ? TRUE : FALSE);
-            copy = wn.matcher(copy).replaceAll(wifiName != null ? wifiName.replaceAll("\"", Tuils.EMPTYSTRING) : "null");
+            copy = wn.matcher(copy).replaceAll(wifiName != null ? wifiName.replaceAll("\"", Tuils.EMPTY_STRING) : "null");
             copy = d0.matcher(copy).replaceAll(mobileOn ? one : zero);
             copy = d1.matcher(copy).replaceAll(mobileOn ? on : off);
             copy = d2.matcher(copy).replaceAll(mobileOn ? ON : OFF);
@@ -590,7 +593,7 @@ public class UIManager implements OnTouchListener {
             Matcher m = ps[0].matcher(s);
             while (m.find()) {
                 if(m.groupCount() < 2) {
-                    s = s.replace(m.group(0), Tuils.EMPTYSTRING);
+                    s = s.replace(m.group(0), Tuils.EMPTY_STRING);
                     continue;
                 }
 
@@ -641,7 +644,7 @@ public class UIManager implements OnTouchListener {
 
     private class WeatherRunnable implements Runnable {
 
-        String key;
+        final String key;
         String url;
 
         public WeatherRunnable() {
@@ -656,7 +659,7 @@ public class UIManager implements OnTouchListener {
             weatherDelay *= 1000;
 
             String where = XMLPrefsManager.get(Behavior.weather_location);
-            if(where == null || where.length() == 0 || (!Tuils.isNumber(where) && !where.contains(","))) {
+            if(where == null || where.isEmpty() || (!Tuils.isNumber(where) && !where.contains(","))) {
 //                Tuils.location(mContext, new Tuils.ArgsRunnable() {
 //                    @Override
 //                    public void run() {
@@ -742,7 +745,7 @@ public class UIManager implements OnTouchListener {
 //        now I'm sorting the labels on the same line for decimals (2.1, 2.0, ...)
         Collections.sort(indexs);
 
-        CharSequence sequence = Tuils.EMPTYSTRING;
+        CharSequence sequence = Tuils.EMPTY_STRING;
 
         for(int c = 0; c < indexs.size(); c++) {
             float i = indexs.get(c);
@@ -761,16 +764,16 @@ public class UIManager implements OnTouchListener {
 
     private SuggestionsManager suggestionsManager;
 
-    private TextView terminalView;
+    private final TextView terminalView;
 
-    private String doubleTapCmd;
-    private boolean lockOnDbTap;
+    private final String doubleTapCmd;
+    private final boolean lockOnDbTap;
 
-    private BroadcastReceiver receiver;
+    private final BroadcastReceiver receiver;
 
     public MainPack pack;
 
-    private boolean clearOnLock;
+    private final boolean clearOnLock;
 
     protected UIManager(final Context context, final ViewGroup rootView, MainPack mainPack, boolean canApplyTheme, CommandExecuter executer) {
 
@@ -793,7 +796,7 @@ public class UIManager implements OnTouchListener {
                 String action = intent.getAction();
 
                 if(action.equals(ACTION_UPDATE_SUGGESTIONS)) {
-                    if(suggestionsManager != null) suggestionsManager.requestSuggestion(Tuils.EMPTYSTRING);
+                    if(suggestionsManager != null) suggestionsManager.requestSuggestion(Tuils.EMPTY_STRING);
                 } else if(action.equals(ACTION_UPDATE_HINT)) {
                     mTerminalAdapter.setDefaultHint();
                 } else if(action.equals(ACTION_ROOT)) {
@@ -822,7 +825,7 @@ public class UIManager implements OnTouchListener {
                 } else if(action.equals(ACTION_CLEAR)) {
                     mTerminalAdapter.clear();
                     if (suggestionsManager != null)
-                        suggestionsManager.requestSuggestion(Tuils.EMPTYSTRING);
+                        suggestionsManager.requestSuggestion(Tuils.EMPTY_STRING);
                 } else if(action.equals(ACTION_WEATHER)) {
                     Calendar c = Calendar.getInstance();
 
@@ -899,16 +902,6 @@ public class UIManager implements OnTouchListener {
             rootView.setBackgroundColor(XMLPrefsManager.getColor(Theme.overlay_color));
         }
 
-//        scrolllllll
-        if(XMLPrefsManager.getBoolean(Behavior.auto_scroll)) {
-            rootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-                int heightDiff = rootView.getRootView().getHeight() - rootView.getHeight();
-                if (heightDiff > Tuils.dpToPx(context, 200)) { // if more than 200 dp, it's probably a keyboard...
-                    if(mTerminalAdapter != null) mTerminalAdapter.scrollToEnd();
-                }
-            });
-        }
-
         clearOnLock = XMLPrefsManager.getBoolean(Behavior.clear_on_lock);
 
         lockOnDbTap = XMLPrefsManager.getBoolean(Behavior.double_tap_lock);
@@ -961,7 +954,7 @@ public class UIManager implements OnTouchListener {
                 @Override
                 public boolean onDoubleTap(MotionEvent e) {
 
-                    if(doubleTapCmd != null && doubleTapCmd.length() > 0) {
+                    if(doubleTapCmd != null && !doubleTapCmd.isEmpty()) {
                         String input = mTerminalAdapter.getInput();
                         mTerminalAdapter.setInput(doubleTapCmd);
                         mTerminalAdapter.simulateEnter();
@@ -1133,9 +1126,7 @@ public class UIManager implements OnTouchListener {
                     labelViews[count].setOnTouchListener(new View.OnTouchListener() {
                         @Override
                         public boolean onTouch(View view, MotionEvent motionEvent) {
-                            Intent intent = new Intent();
-                            ComponentName name = new ComponentName("com.google.android.googlequicksearchbox", "com.google.android.apps.search.weather.WeatherExportedActivity");
-                            intent.setComponent(name);
+                            Intent intent = context.getPackageManager().getLaunchIntentForPackage("com.google.android.apps.weather");
                             context.startActivity(intent);
                             return true;
                         }
@@ -1171,7 +1162,7 @@ public class UIManager implements OnTouchListener {
 
             String username = XMLPrefsManager.get(Ui.username);
             String deviceName = XMLPrefsManager.get(Ui.deviceName);
-            if (deviceName == null || deviceName.length() == 0) {
+            if (deviceName == null || deviceName.isEmpty()) {
                 deviceName = Build.DEVICE;
             }
 
@@ -1275,7 +1266,7 @@ public class UIManager implements OnTouchListener {
             m = timePattern.matcher(unlockFormat);
             if(m.find()) {
                 String s = m.group(3);
-                if(s == null || s.length() == 0) s = "1";
+                if(s == null || s.isEmpty()) s = "1";
 
                 lastUnlocks = new long[Integer.parseInt(s)];
 
@@ -1357,6 +1348,38 @@ public class UIManager implements OnTouchListener {
 
         mTerminalAdapter = new TerminalManager(terminalView, inputView, prefixView, submitView, backView, nextView, deleteView, pasteView, context, mainPack, executer);
 
+        ViewCompat.setWindowInsetsAnimationCallback(rootView.findViewById(R.id.input_down_layout), new WindowInsetsAnimationCompat.Callback(WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP) {
+            @NonNull
+            @Override
+            public WindowInsetsCompat onProgress(@NonNull WindowInsetsCompat insets, @NonNull List<WindowInsetsAnimationCompat> runningAnimations) {
+                WindowInsetsAnimationCompat imeAnimation = null;
+                for (WindowInsetsAnimationCompat animation : runningAnimations) {
+                    if ((animation.getTypeMask() & WindowInsetsCompat.Type.ime()) != 0) {
+                        imeAnimation = animation;
+                        break;
+                    }
+                }
+                if (imeAnimation != null) {
+                    Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
+                    Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) rootView.findViewById(R.id.input_down_layout).getLayoutParams();
+                    mTerminalAdapter.scrollToEndImmediate();
+                    params.bottomMargin = Math.max(bars.bottom, ime.bottom);
+                    rootView.findViewById(R.id.input_down_layout).setLayoutParams(params);
+                }
+                return insets;
+            }
+        });
+
+//        scrolllllll
+        if(XMLPrefsManager.getBoolean(Behavior.auto_scroll)) {
+            rootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+                int heightDiff = rootView.getRootView().getHeight() - rootView.getHeight();
+                if (heightDiff > Tuils.dpToPx(context, 200)) // if more than 200dp, it's probably a keyboard
+                    mTerminalAdapter.scrollToEnd();
+            });
+        }
+
         if (XMLPrefsManager.getBoolean(Suggestions.show_suggestions)) {
             HorizontalScrollView sv = (HorizontalScrollView) rootView.findViewById(R.id.suggestions_container);
             sv.setFocusable(false);
@@ -1374,7 +1397,7 @@ public class UIManager implements OnTouchListener {
             inputView.addTextChangedListener(new SuggestionTextWatcher(suggestionsManager, (currentText, before) -> {
                 if(!hideToolbarNoInput) return;
 
-                if(currentText.length() == 0) toolbarView.setVisibility(View.GONE);
+                if(currentText.isEmpty()) toolbarView.setVisibility(View.GONE);
                 else if(before == 0) toolbarView.setVisibility(View.VISIBLE);
             }));
         } else {
@@ -1415,9 +1438,9 @@ public class UIManager implements OnTouchListener {
         return is;
     }
 
-    private static Pattern sbPattern = Pattern.compile("[\\[\\]\\s]");
+    private static final Pattern sbPattern = Pattern.compile("[\\[\\]\\s]");
     private static String removeSquareBrackets(String s) {
-        return sbPattern.matcher(s).replaceAll(Tuils.EMPTYSTRING);
+        return sbPattern.matcher(s).replaceAll(Tuils.EMPTY_STRING);
     }
 
 //    0 = ext hor
@@ -1545,26 +1568,6 @@ public class UIManager implements OnTouchListener {
         return v.onTouchEvent(event);
     }
 
-    public OnRedirectionListener buildRedirectionListener() {
-        return new OnRedirectionListener() {
-            @Override
-            public void onRedirectionRequest(final RedirectCommand cmd) {
-                ((Activity) mContext).runOnUiThread(() -> {
-                    mTerminalAdapter.setHint(mContext.getString(cmd.getHint()));
-                    disableSuggestions();
-                });
-            }
-
-            @Override
-            public void onRedirectionEnd(RedirectCommand cmd) {
-                ((Activity) mContext).runOnUiThread(() -> {
-                    mTerminalAdapter.setDefaultHint();
-                    enableSuggestions();
-                });
-            }
-        };
-    }
-
     private BroadcastReceiver lockReceiver = null;
     private void registerLockReceiver() {
         if(lockReceiver != null) return;
@@ -1604,13 +1607,17 @@ public class UIManager implements OnTouchListener {
 
     private int unlockColor, unlockTimeOrder;
 
-    private int unlockTimes, unlockHour, unlockMinute, cycleDuration = (int) A_DAY;
+    private int unlockTimes;
+    private int unlockHour;
+    private int unlockMinute;
+    private final int cycleDuration = (int) A_DAY;
     private long lastUnlockTime = -1, nextUnlockCycleRestart;
     private String unlockFormat, notAvailableText, unlockTimeDivider;
 
     private final int UP_DOWN = 1;
 
-    public static String UNLOCK_KEY = "unlockTimes", NEXT_UNLOCK_CYCLE_RESTART = "nextUnlockRestart";
+    public static final String UNLOCK_KEY = "unlockTimes";
+    public static final String NEXT_UNLOCK_CYCLE_RESTART = "nextUnlockRestart";
 
 //    last unlocks are stored here in this way
 //    0 - the first
@@ -1636,7 +1643,7 @@ public class UIManager implements OnTouchListener {
 
     final int UNLOCK_RUNNABLE_DELAY = cycleDuration / 24;
 //    this invalidates the text and checks the time values
-    Runnable unlockTimeRunnable = new Runnable() {
+final Runnable unlockTimeRunnable = new Runnable() {
         @Override
         public void run() {
 //            Tuils.log("run");
@@ -1686,12 +1693,12 @@ public class UIManager implements OnTouchListener {
         }
     };
 
-    Pattern unlockCount = Pattern.compile("%c", Pattern.CASE_INSENSITIVE);
-    Pattern advancement = Pattern.compile("%a(\\d+)(.)");
+    final Pattern unlockCount = Pattern.compile("%c", Pattern.CASE_INSENSITIVE);
+    final Pattern advancement = Pattern.compile("%a(\\d+)(.)");
 //    Pattern timePattern = Pattern.compile("(%t\\d*)(?:\\((?:(\\d+)([^\\)]*))\\)|\\((?:([^\\)]*)(\\d+))\\))?");
-    Pattern timePattern = Pattern.compile("(%t\\d*)(?:\\(([^\\)]*)\\))?(\\d+)?");
-    Pattern indexPattern = Pattern.compile("%i", Pattern.CASE_INSENSITIVE);
-    String whenPattern = "%w";
+final Pattern timePattern = Pattern.compile("(%t\\d*)(?:\\(([^\\)]*)\\))?(\\d+)?");
+    final Pattern indexPattern = Pattern.compile("%i", Pattern.CASE_INSENSITIVE);
+    final String whenPattern = "%w";
 
     private void invalidateUnlockText() {
         String cp = new String(unlockFormat);
@@ -1720,7 +1727,7 @@ public class UIManager implements OnTouchListener {
             String text = timeMatcher.group(2);
             if(text == null) text = whenPattern;
 
-            CharSequence cs = Tuils.EMPTYSTRING;
+            CharSequence cs = Tuils.EMPTY_STRING;
 
             int c, change;
             if(unlockTimeOrder == UP_DOWN) {

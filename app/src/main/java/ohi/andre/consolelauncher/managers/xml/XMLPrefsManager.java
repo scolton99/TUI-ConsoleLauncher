@@ -42,7 +42,7 @@ public class XMLPrefsManager {
     public static final String XML_DEFAULT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
     public static final String VALUE_ATTRIBUTE = "value";
 
-    private static DocumentBuilderFactory factory;
+    private static final DocumentBuilderFactory factory;
     private static DocumentBuilder builder;
 
     static {
@@ -95,9 +95,9 @@ public class XMLPrefsManager {
 //        apps
 //        alias
 
-        public String path;
-        XMLPrefsList values;
-        public List<XMLPrefsSave> enums;
+        public final String path;
+        final XMLPrefsList values;
+        public final List<XMLPrefsSave> enums;
 
         XMLPrefsRoot(XMLPrefsSave[] en) {
             this.values = new XMLPrefsList();
@@ -138,7 +138,7 @@ public class XMLPrefsManager {
 
         File folder = Tuils.getFolder();
         if(folder == null) {
-            Tuils.sendOutput(Color.RED, context, R.string.tuinotfound_xmlprefs);
+            Tuils.sendOutput(Color.RED, context, context.getString(R.string.tui_folder_not_found, "xml"));
             return;
         }
 
@@ -236,7 +236,7 @@ public class XMLPrefsManager {
 
             }
 
-            if(enums.size() == 0) {
+            if(enums.isEmpty()) {
                 if(needToWrite) writeTo(d, file);
                 continue;
             }
@@ -265,7 +265,7 @@ public class XMLPrefsManager {
         if(c == float.class) return Float.parseFloat(s);
         if(c == double.class) return Double.parseDouble(s);
         if(c == File.class) {
-            if(s.length() == 0) return null;
+            if(s.isEmpty()) return null;
 
             File file = new File(s);
             if(!file.exists()) throw new UnsupportedOperationException();
@@ -299,7 +299,7 @@ public class XMLPrefsManager {
             return (int) transform(prefsSave.parent().getValues().get(prefsSave).value, Color.class);
         } catch (Exception e) {
             String def = prefsSave.defaultValue();
-            if(def == null || def.length() == 0) {
+            if(def == null || def.isEmpty()) {
                 return Integer.MAX_VALUE;
             }
 
@@ -355,7 +355,7 @@ public class XMLPrefsManager {
 
     public static boolean wasChanged(XMLPrefsSave save, boolean allowLengthZero) {
         String value = get(save);
-        return (allowLengthZero || value.length() > 0) && !value.equals(save.defaultValue());
+        return (allowLengthZero || !value.isEmpty()) && !value.equals(save.defaultValue());
     }
 
     static final Pattern p1 = Pattern.compile(">");
@@ -425,7 +425,7 @@ public class XMLPrefsManager {
             Object[] o;
             try {
                 o = buildDocument(file, null);
-                if(o == null) return Tuils.EMPTYSTRING;
+                if(o == null) return Tuils.EMPTY_STRING;
             } catch (Exception e) {
                 Tuils.log(e);
                 return e.toString();
@@ -460,16 +460,16 @@ public class XMLPrefsManager {
         return setMany(file, new String[] {elementName}, thatHasThose, forValues, attributeNames, values, addIfNotFound);
     }
 
-    public static String setMany(File file, String elementNames[], String[] attributeNames, String[][] attributeValues) {
+    public static String setMany(File file, String[] elementNames, String[] attributeNames, String[][] attributeValues) {
         return setMany(file, elementNames, null, null, attributeNames, attributeValues, true);
     }
 
-    public static String setMany(File file, String elementNames[], String[] thatHasThose, String[] forValues, String[] attributeNames, String[][] attributeValues, boolean addIfNotFound) {
+    public static String setMany(File file, String[] elementNames, String[] thatHasThose, String[] forValues, String[] attributeNames, String[][] attributeValues, boolean addIfNotFound) {
         try {
             Object[] o;
             try {
                 o = buildDocument(file, null);
-                if(o == null) return Tuils.EMPTYSTRING;
+                if(o == null) return Tuils.EMPTY_STRING;
             } catch (Exception e) {
                 Tuils.log(e);
                 return e.toString();
@@ -479,7 +479,7 @@ public class XMLPrefsManager {
             Element root = (Element) o[1];
 
             if(d == null || root == null) {
-                return Tuils.EMPTYSTRING;
+                return Tuils.EMPTY_STRING;
             }
 
             int nFound = 0;
@@ -513,7 +513,7 @@ public class XMLPrefsManager {
 
             if(nFound < elementNames.length) {
                 for (int count = 0; count < elementNames.length; count++) {
-                    if (elementNames[count] == null || elementNames[count].length() == 0) continue;
+                    if (elementNames[count] == null || elementNames[count].isEmpty()) continue;
 
                     if (!addIfNotFound) continue;
 
@@ -528,7 +528,7 @@ public class XMLPrefsManager {
 
             writeTo(d, file);
 
-            if(nFound == 0) return Tuils.EMPTYSTRING;
+            if(nFound == 0) return Tuils.EMPTY_STRING;
             return null;
         } catch (Exception e) {
             Tuils.log(e);
@@ -547,7 +547,7 @@ public class XMLPrefsManager {
             Object[] o;
             try {
                 o = buildDocument(file, null);
-                if(o == null) return Tuils.EMPTYSTRING;
+                if(o == null) return Tuils.EMPTY_STRING;
             } catch (Exception e) {
                 return e.toString();
             }
@@ -556,7 +556,7 @@ public class XMLPrefsManager {
             Element root = (Element) o[1];
 
             Node n = findNode(root, nodeName, thatHasThose, forValues);
-            if(n == null) return Tuils.EMPTYSTRING;
+            if(n == null) return Tuils.EMPTY_STRING;
 
             root.removeChild(n);
             writeTo(d, file);
@@ -576,7 +576,7 @@ public class XMLPrefsManager {
             Object[] o;
             try {
                 o = buildDocument(file, null);
-                if(o == null) return Tuils.EMPTYSTRING;
+                if(o == null) return Tuils.EMPTY_STRING;
             } catch (Exception e) {
                 return e.toString();
             }
@@ -603,7 +603,7 @@ public class XMLPrefsManager {
 
             writeTo(d, file);
 
-            return check ? null : Tuils.EMPTYSTRING;
+            return check ? null : Tuils.EMPTY_STRING;
         } catch (Exception e) {
             return e.toString();
         }
@@ -718,7 +718,7 @@ public class XMLPrefsManager {
         return true;
     }
 
-    public static boolean resetFile(File f, String name) {
+    public static void resetFile(File f, String name) {
         try {
             if(f.exists()) f.delete();
 
@@ -728,9 +728,7 @@ public class XMLPrefsManager {
             stream.write(("</" + name + ">\n").getBytes());
             stream.flush();
             stream.close();
-            return true;
         } catch (Exception e) {
-            return false;
         }
     }
 
@@ -770,8 +768,8 @@ public class XMLPrefsManager {
     }
 
     public static class IdValue {
-        public String value;
-        public int id;
+        public final String value;
+        public final int id;
 
         public IdValue(String value, int id) {
             this.value = value;
@@ -803,52 +801,52 @@ public class XMLPrefsManager {
 //        return map;
 //    }
 
-//    static final SimpleMutableEntry[] OLD = {
-//            new SimpleMutableEntry("deviceColor", Theme.device_color),
-//            new SimpleMutableEntry("inputColor", Theme.input_color),
-//            new SimpleMutableEntry("outputColor", Theme.output_color),
-//            new SimpleMutableEntry("backgroundColor", Theme.bg_color),
-//            new SimpleMutableEntry("useSystemFont", Ui.system_font),
-//            new SimpleMutableEntry("fontSize", Ui.font_size),
-//            new SimpleMutableEntry("ramColor", Theme.ram_color),
-//            new SimpleMutableEntry("inputFieldBottom", Ui.input_bottom),
-//            new SimpleMutableEntry("username", Ui.username),
-//            new SimpleMutableEntry("showSubmit", Ui.show_enter_button),
-//            new SimpleMutableEntry("deviceName", Ui.deviceName),
-//            new SimpleMutableEntry("showRam", Ui.show_ram),
-//            new SimpleMutableEntry("showDevice", Ui.show_device_name),
-//            new SimpleMutableEntry("showToolbar", Toolbar.show_toolbar),
+//    static final AbstractMap.SimpleEntry[] OLD = {
+//            new AbstractMap.SimpleEntry("deviceColor", Theme.device_color),
+//            new AbstractMap.SimpleEntry("inputColor", Theme.input_color),
+//            new AbstractMap.SimpleEntry("outputColor", Theme.output_color),
+//            new AbstractMap.SimpleEntry("backgroundColor", Theme.bg_color),
+//            new AbstractMap.SimpleEntry("useSystemFont", Ui.system_font),
+//            new AbstractMap.SimpleEntry("fontSize", Ui.font_size),
+//            new AbstractMap.SimpleEntry("ramColor", Theme.ram_color),
+//            new AbstractMap.SimpleEntry("inputFieldBottom", Ui.input_bottom),
+//            new AbstractMap.SimpleEntry("username", Ui.username),
+//            new AbstractMap.SimpleEntry("showSubmit", Ui.show_enter_button),
+//            new AbstractMap.SimpleEntry("deviceName", Ui.deviceName),
+//            new AbstractMap.SimpleEntry("showRam", Ui.show_ram),
+//            new AbstractMap.SimpleEntry("showDevice", Ui.show_device_name),
+//            new AbstractMap.SimpleEntry("showToolbar", Toolbar.show_toolbar),
 //
-//            new SimpleMutableEntry("suggestionTextColor", Suggestions.default_text_color),
-//            new SimpleMutableEntry("transparentSuggestions", Suggestions.transparent),
-//            new SimpleMutableEntry("aliasSuggestionBg", Suggestions.alias_bg_color),
-//            new SimpleMutableEntry("appSuggestionBg", Suggestions.apps_bg_color),
-//            new SimpleMutableEntry("commandSuggestionsBg", Suggestions.cmd_bg_color),
-//            new SimpleMutableEntry("songSuggestionBg", Suggestions.song_bg_color),
-//            new SimpleMutableEntry("contactSuggestionBg", Suggestions.contact_bg_color),
-//            new SimpleMutableEntry("fileSuggestionBg", Suggestions.file_bg_color),
-//            new SimpleMutableEntry("defaultSuggestionBg", Suggestions.default_bg_color),
+//            new AbstractMap.SimpleEntry("suggestionTextColor", Suggestions.default_text_color),
+//            new AbstractMap.SimpleEntry("transparentSuggestions", Suggestions.transparent),
+//            new AbstractMap.SimpleEntry("aliasSuggestionBg", Suggestions.alias_bg_color),
+//            new AbstractMap.SimpleEntry("appSuggestionBg", Suggestions.apps_bg_color),
+//            new AbstractMap.SimpleEntry("commandSuggestionsBg", Suggestions.cmd_bg_color),
+//            new AbstractMap.SimpleEntry("songSuggestionBg", Suggestions.song_bg_color),
+//            new AbstractMap.SimpleEntry("contactSuggestionBg", Suggestions.contact_bg_color),
+//            new AbstractMap.SimpleEntry("fileSuggestionBg", Suggestions.file_bg_color),
+//            new AbstractMap.SimpleEntry("defaultSuggestionBg", Suggestions.default_bg_color),
 //
-//            new SimpleMutableEntry("useSystemWallpaper", Ui.system_wallpaper),
-//            new SimpleMutableEntry("fullscreen", Ui.fullscreen),
-//            new SimpleMutableEntry("keepAliveWithNotification", Behavior.tui_notification),
-//            new SimpleMutableEntry("openKeyboardOnStart", Behavior.auto_show_keyboard),
+//            new AbstractMap.SimpleEntry("useSystemWallpaper", Ui.system_wallpaper),
+//            new AbstractMap.SimpleEntry("fullscreen", Ui.fullscreen),
+//            new AbstractMap.SimpleEntry("keepAliveWithNotification", Behavior.tui_notification),
+//            new AbstractMap.SimpleEntry("openKeyboardOnStart", Behavior.auto_show_keyboard),
 //
-//            new SimpleMutableEntry("fromMediastore", Behavior.songs_from_mediastore),
-//            new SimpleMutableEntry("playRandom", Behavior.random_play),
-//            new SimpleMutableEntry("songsFolder", Behavior.songs_folder),
+//            new AbstractMap.SimpleEntry("fromMediastore", Behavior.songs_from_mediastore),
+//            new AbstractMap.SimpleEntry("playRandom", Behavior.random_play),
+//            new AbstractMap.SimpleEntry("songsFolder", Behavior.songs_folder),
 //
-//            new SimpleMutableEntry("closeOnDbTap", Behavior.double_tap_closes),
-//            new SimpleMutableEntry("showSuggestions", Suggestions.show_suggestions),
-//            new SimpleMutableEntry("showDonationMessage", Behavior.donation_message),
-//            new SimpleMutableEntry("showAliasValue", Behavior.show_alias_content),
-//            new SimpleMutableEntry("showAppsHistory", Behavior.show_launch_history),
+//            new AbstractMap.SimpleEntry("closeOnDbTap", Behavior.double_tap_closes),
+//            new AbstractMap.SimpleEntry("showSuggestions", Suggestions.show_suggestions),
+//            new AbstractMap.SimpleEntry("showDonationMessage", Behavior.donation_message),
+//            new AbstractMap.SimpleEntry("showAliasValue", Behavior.show_alias_content),
+//            new AbstractMap.SimpleEntry("showAppsHistory", Behavior.show_launch_history),
 //
-//            new SimpleMutableEntry("defaultSearch", Cmd.default_search)
+//            new AbstractMap.SimpleEntry("defaultSearch", Cmd.default_search)
 //    };
 //
 //    private static XMLPrefsSave getCorresponding(String old) {
-//        for(SimpleMutableEntry<String, XMLPrefsSave> s : OLD) {
+//        for(AbstractMap.SimpleEntry<String, XMLPrefsSave> s : OLD) {
 //            if(old.equals(s.getKey())) return s.getValue();
 //        }
 //        return null;

@@ -1,14 +1,15 @@
 package ohi.andre.consolelauncher.commands.main.raw;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.managers.TimeManager;
 
 /**
  * Created by andre on 03/12/15.
  */
-public class time implements CommandAbstraction {
+public class time extends AbstractCommand {
     @Override
     public String exec(ExecutePack pack) {
         int index = pack.getInt();
@@ -22,7 +23,7 @@ public class time implements CommandAbstraction {
 
     @Override
     public int[] argType() {
-        return new int[] {CommandAbstraction.INT};
+        return new int[] {Command.INT};
     }
 
     @Override

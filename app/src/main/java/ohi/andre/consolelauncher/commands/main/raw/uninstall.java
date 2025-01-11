@@ -4,12 +4,13 @@ import android.content.Intent;
 import android.net.Uri;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.tuils.Tuils;
 
-public class uninstall implements CommandAbstraction {
+public class uninstall extends AbstractCommand {
 
     @Override
     public String exec(ExecutePack pack) {
@@ -21,7 +22,7 @@ public class uninstall implements CommandAbstraction {
         Intent uninstallIntent = new Intent(Intent.ACTION_DELETE, packageURI);
         info.context.startActivity(uninstallIntent);
 
-        return Tuils.EMPTYSTRING;
+        return Tuils.EMPTY_STRING;
     }
 
     @Override
@@ -31,7 +32,7 @@ public class uninstall implements CommandAbstraction {
 
     @Override
     public int[] argType() {
-        return new int[]{CommandAbstraction.VISIBLE_PACKAGE};
+        return new int[]{Command.VISIBLE_PACKAGE};
     }
 
     @Override
@@ -48,7 +49,7 @@ public class uninstall implements CommandAbstraction {
     @Override
     public String onArgNotFound(ExecutePack pack, int index) {
         MainPack info = (MainPack) pack;
-        return info.res.getString(R.string.output_appnotfound);
+        return info.res.getString(R.string.output_app_not_found);
     }
 
 }

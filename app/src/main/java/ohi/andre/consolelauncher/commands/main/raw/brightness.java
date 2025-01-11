@@ -9,7 +9,8 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 
 import static android.provider.Settings.System.SCREEN_BRIGHTNESS;
@@ -21,12 +22,12 @@ import static android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL;
  * Created by francescoandreuzzi on 27/03/2018.
  */
 
-public class brightness implements CommandAbstraction {
+public class brightness extends AbstractCommand {
     @Override
     public String exec(final ExecutePack pack) throws Exception {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.System.canWrite(pack.context)) {
             pack.context.startActivity(new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS));
-            return pack.context.getString(R.string.output_waitingpermission);
+            return pack.context.getString(R.string.output_waiting_permissions);
         }
 
         final int brightness = pack.getInt();
@@ -71,7 +72,7 @@ public class brightness implements CommandAbstraction {
 
     @Override
     public int[] argType() {
-        return new int[] {CommandAbstraction.INT};
+        return new int[] {Command.INT};
     }
 
     @Override

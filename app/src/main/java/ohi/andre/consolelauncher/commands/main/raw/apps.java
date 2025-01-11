@@ -9,7 +9,8 @@ import android.net.Uri;
 import java.io.File;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand;
@@ -25,7 +26,7 @@ public class apps extends ParamCommand {
         ls {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.PLAIN_TEXT};
+                return new int[] {Command.PLAIN_TEXT};
             }
 
             @Override
@@ -41,7 +42,7 @@ public class apps extends ParamCommand {
         lsh {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.PLAIN_TEXT};
+                return new int[] {Command.PLAIN_TEXT};
             }
 
             @Override
@@ -57,7 +58,7 @@ public class apps extends ParamCommand {
         show {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.HIDDEN_PACKAGE};
+                return new int[] {Command.HIDDEN_PACKAGE};
             }
 
             @Override
@@ -70,7 +71,7 @@ public class apps extends ParamCommand {
         hide {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.VISIBLE_PACKAGE};
+                return new int[] {Command.VISIBLE_PACKAGE};
             }
 
             @Override
@@ -83,7 +84,7 @@ public class apps extends ParamCommand {
         l {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.VISIBLE_PACKAGE};
+                return new int[] {Command.VISIBLE_PACKAGE};
             }
 
             @Override
@@ -101,19 +102,19 @@ public class apps extends ParamCommand {
         ps {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.VISIBLE_PACKAGE};
+                return new int[] {Command.VISIBLE_PACKAGE};
             }
 
             @Override
             public String exec(ExecutePack pack) {
-                openPlaystore(pack.context, pack.getLaunchInfo().componentName.getPackageName());
+                openPlayStore(pack.context, pack.getLaunchInfo().componentName.getPackageName());
                 return null;
             }
         },
         default_app {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.INT, CommandAbstraction.DEFAULT_APP};
+                return new int[] {Command.INT, Command.DEFAULT_APP};
             }
 
             @Override
@@ -143,7 +144,7 @@ public class apps extends ParamCommand {
             public String onArgNotFound(ExecutePack pack, int index) {
                 int res;
                 if(index == 1) res = R.string.invalid_integer;
-                else res = R.string.output_appnotfound;
+                else res = R.string.output_app_not_found;
 
                 return pack.context.getString(res);
             }
@@ -151,7 +152,7 @@ public class apps extends ParamCommand {
         st {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.VISIBLE_PACKAGE};
+                return new int[] {Command.VISIBLE_PACKAGE};
             }
 
             @Override
@@ -163,7 +164,7 @@ public class apps extends ParamCommand {
         frc {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.ALL_PACKAGES};
+                return new int[] {Command.ALL_PACKAGES};
             }
 
             @Override
@@ -189,7 +190,7 @@ public class apps extends ParamCommand {
 //        services {
 //            @Override
 //            public int[] args() {
-//                return new int[] {CommandAbstraction.VISIBLE_PACKAGE};
+//                return new int[] {Command.VISIBLE_PACKAGE};
 //            }
 //
 //            @Override
@@ -203,7 +204,7 @@ public class apps extends ParamCommand {
 //                    ComponentName name = i.service;
 //
 //                    if(info.equals(name.getPackageName())) {
-//                        services.add(name.getClassName().replace(name.getPackageName(), Tuils.EMPTYSTRING));
+//                        services.add(name.getClassName().replace(name.getPackageName(), Tuils.EMPTY_STRING));
 //                    }
 //                }
 //
@@ -215,16 +216,16 @@ public class apps extends ParamCommand {
 //            @Override
 //            public String onNotArgEnough(ExecutePack pack, int n) {
 //
-//                List<SimpleMutableEntry<String, ArrayList<String>>> services = new ArrayList<>();
+//                List<AbstractMap.SimpleEntry<String, ArrayList<String>>> services = new ArrayList<>();
 //
 //                ActivityManager activityManager = (ActivityManager) pack.context.getSystemService(Context.ACTIVITY_SERVICE);
 //                Tuils.log(activityManager.getRunningServices(Integer.MAX_VALUE).toString());
 //                for(ActivityManager.RunningServiceInfo i : activityManager.getRunningServices(Integer.MAX_VALUE)) {
 //
 //                    boolean check = false;
-//                    for(SimpleMutableEntry<String, ArrayList<String>> s : services) {
+//                    for(AbstractMap.SimpleEntry<String, ArrayList<String>> s : services) {
 //                        if(s.getKey().equals(i.service.getPackageName())) {
-//                            s.getValue().add(i.service.getClassName().replace(i.service.getPackageName(), Tuils.EMPTYSTRING));
+//                            s.getValue().add(i.service.getClassName().replace(i.service.getPackageName(), Tuils.EMPTY_STRING));
 //
 //                            check = true;
 //                            break;
@@ -232,23 +233,23 @@ public class apps extends ParamCommand {
 //                    }
 //
 //                    if(!check) {
-//                        SimpleMutableEntry<String,ArrayList<String>> s = new SimpleMutableEntry<>(i.service.getPackageName(), new ArrayList<String>());
-//                        s.getValue().add(i.service.getClassName().replace(i.service.getPackageName(), Tuils.EMPTYSTRING));
+//                        AbstractMap.SimpleEntry<String,ArrayList<String>> s = new AbstractMap.SimpleEntry<>(i.service.getPackageName(), new ArrayList<String>());
+//                        s.getValue().add(i.service.getClassName().replace(i.service.getPackageName(), Tuils.EMPTY_STRING));
 //                        services.add(s);
 //                    }
 //                }
 //
 //                if(services.size() == 0) return "[]";
-//                Collections.sort(services, new Comparator<SimpleMutableEntry<String, ArrayList<String>>>() {
+//                Collections.sort(services, new Comparator<AbstractMap.SimpleEntry<String, ArrayList<String>>>() {
 //                    @Override
-//                    public int compare(SimpleMutableEntry<String, ArrayList<String>> o1, SimpleMutableEntry<String, ArrayList<String>> o2) {
+//                    public int compare(AbstractMap.SimpleEntry<String, ArrayList<String>> o1, AbstractMap.SimpleEntry<String, ArrayList<String>> o2) {
 //                        return o1.getKey().compareTo(o2.getKey());
 //                    }
 //                });
 //
 //                PackageManager manager = pack.context.getPackageManager();
 //                StringBuilder b = new StringBuilder();
-//                for(SimpleMutableEntry<String, ArrayList<String>> s : services) {
+//                for(AbstractMap.SimpleEntry<String, ArrayList<String>> s : services) {
 //                    String appName = null;
 //                    try {
 //                        appName = manager.getApplicationInfo(s.getKey(), 0).loadLabel(manager).toString();
@@ -269,7 +270,7 @@ public class apps extends ParamCommand {
         reset {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.VISIBLE_PACKAGE};
+                return new int[] {Command.VISIBLE_PACKAGE};
             }
 
             @Override
@@ -281,10 +282,16 @@ public class apps extends ParamCommand {
                 return null;
             }
         },
-        mkgp {
+        MakeGroup {
+            @Override
+            public String label() {
+                //noinspection SpellCheckingInspection
+                return Tuils.MINUS + "mkgp";
+            }
+
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.NO_SPACE_STRING};
+                return new int[] {Command.NO_SPACE_STRING};
             }
 
             @Override
@@ -293,10 +300,16 @@ public class apps extends ParamCommand {
                 return ((MainPack) pack).appsManager.createGroup(name);
             }
         },
-        rmgp {
+        RemoveGroup {
+            @Override
+            public String label() {
+                //noinspection SpellCheckingInspection
+                return Tuils.MINUS + "rmgp";
+            }
+
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.APP_GROUP};
+                return new int[] {Command.APP_GROUP};
             }
 
             @Override
@@ -308,7 +321,7 @@ public class apps extends ParamCommand {
         gp_bg_color {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.APP_GROUP, CommandAbstraction.COLOR};
+                return new int[] {Command.APP_GROUP, Command.COLOR};
             }
 
             @Override
@@ -322,20 +335,20 @@ public class apps extends ParamCommand {
             public String onNotArgEnough(ExecutePack pack, int n) {
                 if(n == 2) {
                     String name = pack.getString();
-                    return ((MainPack) pack).appsManager.groupBgColor(name, Tuils.EMPTYSTRING);
+                    return ((MainPack) pack).appsManager.groupBgColor(name, Tuils.EMPTY_STRING);
                 }
                 return super.onNotArgEnough(pack, n);
             }
 
             @Override
             public String onArgNotFound(ExecutePack pack, int index) {
-                return pack.context.getString(R.string.output_invalidcolor);
+                return pack.context.getString(R.string.output_invalid_color);
             }
         },
         gp_fore_color {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.APP_GROUP, CommandAbstraction.COLOR};
+                return new int[] {Command.APP_GROUP, Command.COLOR};
             }
 
             @Override
@@ -349,20 +362,26 @@ public class apps extends ParamCommand {
             public String onNotArgEnough(ExecutePack pack, int n) {
                 if(n == 2) {
                     String name = pack.getString();
-                    return ((MainPack) pack).appsManager.groupForeColor(name, Tuils.EMPTYSTRING);
+                    return ((MainPack) pack).appsManager.groupForeColor(name, Tuils.EMPTY_STRING);
                 }
                 return super.onNotArgEnough(pack, n);
             }
 
             @Override
             public String onArgNotFound(ExecutePack pack, int index) {
-                return pack.context.getString(R.string.output_invalidcolor);
+                return pack.context.getString(R.string.output_invalid_color);
             }
         },
-        lsgp {
+        ListGroups {
+            @Override
+            public String label() {
+                //noinspection SpellCheckingInspection
+                return Tuils.MINUS + "lsgp";
+            }
+
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.APP_GROUP};
+                return new int[] {Command.APP_GROUP};
             }
 
             @Override
@@ -376,10 +395,16 @@ public class apps extends ParamCommand {
                 return ((MainPack) pack).appsManager.listGroups();
             }
         },
-        addtogp {
+        AddToGroup {
+            @Override
+            public String label() {
+                //noinspection SpellCheckingInspection
+                return Tuils.MINUS + "addtogp";
+            }
+
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.APP_GROUP, CommandAbstraction.VISIBLE_PACKAGE};
+                return new int[] {Command.APP_GROUP, Command.VISIBLE_PACKAGE};
             }
 
             @Override
@@ -389,10 +414,16 @@ public class apps extends ParamCommand {
                 return ((MainPack) pack).appsManager.addAppToGroup(name, app);
             }
         },
-        rmfromgp {
+        RemoveFromGroup {
+            @Override
+            public String label() {
+                //noinspection SpellCheckingInspection
+                return Tuils.MINUS + "rmfromgp";
+            }
+
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.APP_GROUP, CommandAbstraction.APP_INSIDE_GROUP};
+                return new int[] {Command.APP_GROUP, Command.APP_INSIDE_GROUP};
             }
 
             @Override
@@ -447,7 +478,7 @@ public class apps extends ParamCommand {
 
         @Override
         public String onArgNotFound(ExecutePack pack, int index) {
-            return pack.context.getString(R.string.output_appnotfound);
+            return pack.context.getString(R.string.output_app_not_found);
         }
     }
 
@@ -465,7 +496,7 @@ public class apps extends ParamCommand {
         Tuils.openSettingsPage(context, packageName);
     }
 
-    private static void openPlaystore(Context context, String packageName) {
+    private static void openPlayStore(Context context, String packageName) {
         try {
             context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + packageName)));
         } catch (Exception e) {

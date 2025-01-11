@@ -12,7 +12,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -47,13 +47,13 @@ import static ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.writeTo;
 
 public class ReplyManager implements XMLPrefsElement {
 
-    public static String PATH = "reply.xml";
-    public static String NAME = "REPLY";
-    public static String ACTION = BuildConfig.APPLICATION_ID + ".reply";
-    public static String ID = "id";
-    public static String WHAT = "what";
-    public static String ACTION_UPDATE = BuildConfig.APPLICATION_ID + ".update";
-    public static String ACTION_LS = BuildConfig.APPLICATION_ID + ".lsreplies";
+    public static final String PATH = "reply.xml";
+    public static final String NAME = "REPLY";
+    public static final String ACTION = BuildConfig.APPLICATION_ID + ".reply";
+    public static final String ID = "id";
+    public static final String WHAT = "what";
+    public static final String ACTION_UPDATE = BuildConfig.APPLICATION_ID + ".update";
+    public static final String ACTION_LS = BuildConfig.APPLICATION_ID + ".lsreplies";
 
     private static final String ID_ATTRIBUTE = "id";
 
@@ -198,7 +198,7 @@ public class ReplyManager implements XMLPrefsElement {
                 }
             }
 
-            if (loadPrefs && enums.size() > 0) {
+            if (loadPrefs && !enums.isEmpty()) {
                 for (XMLPrefsSave s : enums) {
                     String value = s.defaultValue();
 
@@ -418,7 +418,7 @@ public class ReplyManager implements XMLPrefsElement {
             for(BoundApp a : boundApps) builder.append(a.packageName).append(" -> ").append(a.applicationId).append(Tuils.NEWLINE);
         }
         String s = builder.toString();
-        if(s.length() == 0) s = "[]";
+        if(s.isEmpty()) s = "[]";
 
         Tuils.sendOutput(context, s);
     }

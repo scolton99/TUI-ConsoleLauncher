@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -28,24 +28,25 @@ import ohi.andre.consolelauncher.tuils.Tuils;
 
 public class AliasManager {
 
-    public static String ACTION_LS = BuildConfig.APPLICATION_ID + ".alias_ls";
-    public static String ACTION_ADD = BuildConfig.APPLICATION_ID + ".alias_add";
-    public static String ACTION_RM = BuildConfig.APPLICATION_ID + ".alias_rm";
+    public static final String ACTION_LS = BuildConfig.APPLICATION_ID + ".alias_ls";
+    public static final String ACTION_ADD = BuildConfig.APPLICATION_ID + ".alias_add";
+    public static final String ACTION_RM = BuildConfig.APPLICATION_ID + ".alias_rm";
 
-    public static String NAME = "name";
+    public static final String NAME = "name";
 
     public static final String PATH = "alias.txt";
 
     private List<Alias> aliases;
-    private String paramSeparator, aliasLabelFormat;
-    private boolean replaceAllMarkers;
+    private final String paramSeparator;
+    private final String aliasLabelFormat;
+    private final boolean replaceAllMarkers;
 
-    private Context context;
+    private final Context context;
 
-    private String paramMarker;
-    private Pattern parameterPattern;
+    private final String paramMarker;
+    private final Pattern parameterPattern;
 
-    private BroadcastReceiver receiver;
+    private final BroadcastReceiver receiver;
 
     public AliasManager(Context c) {
         this.context = c;
@@ -80,7 +81,7 @@ public class AliasManager {
     }
 
     public String printAliases() {
-        String output = Tuils.EMPTYSTRING;
+        String output = Tuils.EMPTY_STRING;
         for (Alias a : aliases) {
             output = output.concat(a.name + " --> " + a.value + Tuils.NEWLINE);
         }
@@ -93,11 +94,11 @@ public class AliasManager {
 //    [2] = residualString
     public String[] getAlias(String alias, boolean supportSpaces) {
         if(supportSpaces) {
-            String args = Tuils.EMPTYSTRING;
+            String args = Tuils.EMPTY_STRING;
 
             String aliasValue = null;
             while (true) {
-                aliasValue = getALias(alias);
+                aliasValue = getAlias(alias);
                 if(aliasValue != null) break;
                 else {
                     int index = alias.lastIndexOf(Tuils.SPACE);
@@ -111,17 +112,17 @@ public class AliasManager {
 
             return new String[] {aliasValue, alias, args};
         } else {
-            return new String[] {getALias(alias), alias, Tuils.EMPTYSTRING};
+            return new String[] {getAlias(alias), alias, Tuils.EMPTY_STRING};
         }
     }
 
 //    this prevents some errors related to the % sign
     private final String SECURITY_REPLACEMENT = "{#@";
-    private Pattern securityPattern = Pattern.compile(Pattern.quote(SECURITY_REPLACEMENT));
+    private final Pattern securityPattern = Pattern.compile(Pattern.quote(SECURITY_REPLACEMENT));
 
     public String format(String aliasValue, String params) {
         params = params.trim();
-        if(params.length() == 0) return aliasValue;
+        if(params.isEmpty()) return aliasValue;
 
         int before = aliasValue.length();
         aliasValue = parameterPattern.matcher(aliasValue).replaceAll(SECURITY_REPLACEMENT);
@@ -138,7 +139,7 @@ public class AliasManager {
         return aliasValue;
     }
 
-    private String getALias(String name) {
+    private String getAlias(String name) {
         for(Alias a : aliases) {
             if(name.equals(a.name)) return a.value;
         }
@@ -187,7 +188,7 @@ public class AliasManager {
                 String[] splatted = line.split("=");
                 if(splatted.length < 2) continue;
 
-                String name, value = Tuils.EMPTYSTRING;
+                String name, value = Tuils.EMPTY_STRING;
                 name = splatted[0];
 
                 for(int c = 1; c < splatted.length; c++) {
@@ -200,10 +201,10 @@ public class AliasManager {
 
                 if(name.equalsIgnoreCase(value)) {
                     Tuils.sendOutput(Color.RED, context,
-                            context.getString(R.string.output_notaddingalias1) + Tuils.SPACE + name + Tuils.SPACE + context.getString(R.string.output_notaddingalias2));
+                            context.getString(R.string.output_problem_adding_alias_same_name, name));
                 } else if(value.startsWith(name + Tuils.SPACE)) {
                     Tuils.sendOutput(Color.RED, context,
-                            context.getString(R.string.output_notaddingalias1) + Tuils.SPACE + name + Tuils.SPACE + context.getString(R.string.output_notaddingalias3));
+                            context.getString(R.string.output_problem_adding_alias_same_name_before_equals, name));
                 } else {
                     aliases.add(new Alias(name, value, parameterPattern));
                 }
@@ -268,11 +269,11 @@ public class AliasManager {
         }
     }
 
-    public List<Alias> getAliases(boolean excludeEmtpy) {
+    public List<Alias> getAliases(boolean excludeEmpty) {
         List<Alias> l = new ArrayList<>(aliases);
-        if(excludeEmtpy) {
+        if(excludeEmpty) {
             for(int c = 0; c < l.size(); c++) {
-                if(l.get(c).name.length() == 0) {
+                if(l.get(c).name.isEmpty()) {
                     l.remove(c);
                     break;
                 }
@@ -283,8 +284,9 @@ public class AliasManager {
     }
 
     public static class Alias {
-        public String name, value;
-        public boolean isParametrized;
+        public final String name;
+        public final String value;
+        public final boolean isParametrized;
 
         public Alias(String name, String value, Pattern parameterPattern) {
             this.name = name;

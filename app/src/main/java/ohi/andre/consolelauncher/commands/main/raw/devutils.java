@@ -1,13 +1,14 @@
 package ohi.andre.consolelauncher.commands.main.raw;
 
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import java.util.List;
 
 import ohi.andre.consolelauncher.BuildConfig;
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand;
@@ -26,7 +27,7 @@ public class devutils extends ParamCommand {
                 List<String> text = pack.getList();
 
                 String title, txt = null;
-                if(text.size() == 0) return null;
+                if(text.isEmpty()) return null;
                 else {
                     title = text.remove(0);
                     if(text.size() >= 2) txt = Tuils.toPlanString(text, Tuils.SPACE);
@@ -44,7 +45,7 @@ public class devutils extends ParamCommand {
 
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.TEXTLIST};
+                return new int[] {Command.TEXTLIST};
             }
         },
         check_notifications {
@@ -86,7 +87,7 @@ public class devutils extends ParamCommand {
 
         @Override
         public String onNotArgEnough(ExecutePack pack, int n) {
-            return pack.context.getString(R.string.help_devutils);
+            return pack.context.getString(R.string.help_dev_utils);
         }
 
         @Override
@@ -107,7 +108,7 @@ public class devutils extends ParamCommand {
 
     @Override
     public int helpRes() {
-        return R.string.help_devutils;
+        return R.string.help_dev_utils;
     }
 
     @Override

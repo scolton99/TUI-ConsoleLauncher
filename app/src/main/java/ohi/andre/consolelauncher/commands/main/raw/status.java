@@ -13,7 +13,8 @@ import android.provider.Settings;
 import java.lang.reflect.Method;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.tuils.Tuils;
@@ -25,7 +26,7 @@ import static android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC;
 /**
  * Created by francescoandreuzzi on 05/04/16.
  */
-public class status implements CommandAbstraction {
+public class status extends AbstractCommand {
 
     @Override
     public String exec(ExecutePack pack) {
@@ -97,7 +98,7 @@ public class status implements CommandAbstraction {
                 .append(info.res.getString(R.string.mobile_data_label)).append(Tuils.SPACE).append(mobileOn).append(Tuils.NEWLINE)
                 .append(info.res.getString(R.string.bluetooth_label)).append(Tuils.SPACE).append(bluetoothOn).append(Tuils.NEWLINE)
                 .append(info.res.getString(R.string.location_label)).append(Tuils.SPACE).append(gps_enabled || network_enabled).append(Tuils.NEWLINE)
-                .append(info.res.getString(R.string.brightness_label)).append(Tuils.SPACE).append(autobrightnessState == SCREEN_BRIGHTNESS_MODE_AUTOMATIC ? "(auto) " : Tuils.EMPTYSTRING).append(b).append("%");
+                .append(info.res.getString(R.string.brightness_label)).append(Tuils.SPACE).append(autobrightnessState == SCREEN_BRIGHTNESS_MODE_AUTOMATIC ? "(auto) " : Tuils.EMPTY_STRING).append(b).append("%");
 
         return builder.toString();
     }

@@ -27,20 +27,20 @@ public class MessagesManager {
     boolean donate = false;
     final int REACH_THIS = 20;
 
-    List<String> original;
+    final List<String> original;
     List<String> copy;
 
     int count;
     Random random;
 
-    Context context;
-    int color;
+    final Context context;
+    final int color;
 
-    boolean tutorialMode;
+    final boolean tutorialMode;
 
     final int delay = 100;
-    Handler handler = new Handler();
-    Runnable post = this::tryPrint;
+    final Handler handler = new Handler();
+    final Runnable post = this::tryPrint;
 
     public MessagesManager(Context context) {
         this.context = context;
@@ -94,7 +94,7 @@ public class MessagesManager {
             if(donate) {
                 Tuils.sendOutput(color, context, R.string.donate);
             } else {
-                if(copy.size() == 0) {
+                if(copy.isEmpty()) {
                     copy = new ArrayList<>(original);
                     random = new Random();
                 }

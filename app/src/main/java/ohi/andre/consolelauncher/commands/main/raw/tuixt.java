@@ -8,8 +8,9 @@ import java.io.IOException;
 
 import ohi.andre.consolelauncher.LauncherActivity;
 import ohi.andre.consolelauncher.R;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.tuixt.TuixtActivity;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.managers.FileManager;
@@ -19,14 +20,14 @@ import ohi.andre.consolelauncher.tuils.Tuils;
  * Created by francescoandreuzzi on 18/01/2017.
  */
 
-public class tuixt implements CommandAbstraction {
+public class tuixt extends AbstractCommand {
 
     @Override
     public String exec(ExecutePack pack) {
         MainPack info = (MainPack) pack;
         File file = info.get(File.class);
         if(file.isDirectory()) {
-            return info.res.getString(R.string.output_isdirectory);
+            return info.res.getString(R.string.output_is_directory);
         }
 
         Intent intent = new Intent(info.context, TuixtActivity.class);
@@ -34,12 +35,12 @@ public class tuixt implements CommandAbstraction {
         intent.putExtra(TuixtActivity.PATH, file.getAbsolutePath());
         ((Activity) info.context).startActivityForResult(intent, LauncherActivity.TUIXT_REQUEST);
 
-        return Tuils.EMPTYSTRING;
+        return Tuils.EMPTY_STRING;
     }
 
     @Override
     public int[] argType() {
-        return new int[] {CommandAbstraction.FILE};
+        return new int[] {Command.FILE};
     }
 
     @Override
@@ -57,7 +58,7 @@ public class tuixt implements CommandAbstraction {
         MainPack info = (MainPack) pack;
 
         String path = info.getString();
-        if(path == null || path.length() == 0) {
+        if(path == null || path.isEmpty()) {
             return onNotArgEnough(info, info.args.length);
         }
 
@@ -78,7 +79,7 @@ public class tuixt implements CommandAbstraction {
         intent.putExtra(TuixtActivity.PATH, file.getAbsolutePath());
         ((Activity) info.context).startActivityForResult(intent, LauncherActivity.TUIXT_REQUEST);
 
-        return Tuils.EMPTYSTRING;
+        return Tuils.EMPTY_STRING;
     }
 
     @Override

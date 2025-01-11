@@ -14,7 +14,7 @@ public class CommandsPreferences {
 
     public static final String PRIORITY_SUFFIX = "_priority";
 
-    private HashMap<String, String> preferenceHashMap;
+    private final HashMap<String, String> preferenceHashMap;
 
     public CommandsPreferences() {
         preferenceHashMap = new HashMap<>();
@@ -32,11 +32,11 @@ public class CommandsPreferences {
 
     public String get(XMLPrefsSave save) {
         String v = get(save.label());
-        if(v == null || v.length() == 0) v = save.defaultValue();
+        if(v == null || v.isEmpty()) v = save.defaultValue();
         return v;
     }
 
-    public int userSetPriority(CommandAbstraction c) {
+    public int userSetPriority(Command c) {
         try {
             String p = get(c.getClass().getSimpleName() + PRIORITY_SUFFIX);
             return Integer.parseInt(p);
@@ -45,7 +45,7 @@ public class CommandsPreferences {
         }
     }
 
-    public int getPriority(CommandAbstraction c) {
+    public int getPriority(Command c) {
         int priority = userSetPriority(c);
         if(priority == Integer.MAX_VALUE) return c.priority();
         return priority;

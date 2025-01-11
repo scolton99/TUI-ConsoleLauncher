@@ -1,7 +1,8 @@
 package ohi.andre.consolelauncher.commands.tuixt.raw;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.tuixt.TuixtPack;
 import ohi.andre.consolelauncher.managers.FileManager;
@@ -10,7 +11,7 @@ import ohi.andre.consolelauncher.managers.FileManager;
  * Created by francescoandreuzzi on 24/01/2017.
  */
 
-public class save implements CommandAbstraction {
+public class save extends AbstractCommand {
 
     @Override
     public String exec(ExecutePack info) throws Exception {
@@ -49,5 +50,10 @@ public class save implements CommandAbstraction {
     @Override
     public String onNotArgEnough(ExecutePack info, int nArgs) {
         return null;
+    }
+
+    @Override
+    public String getName() {
+        return "save";
     }
 }

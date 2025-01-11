@@ -1,7 +1,8 @@
 package ohi.andre.consolelauncher.commands.main.raw;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand;
@@ -21,13 +22,13 @@ public class regex extends ParamCommand {
             public String exec(ExecutePack pack) {
                 String output = RegexManager.instance.add(pack.getInt(), pack.getString());
                 if(output == null) return null;
-                if(output.length() == 0) return pack.context.getString(R.string.id_already);
+                if(output.isEmpty()) return pack.context.getString(R.string.id_already);
                 else return output;
             }
 
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.INT, CommandAbstraction.PLAIN_TEXT};
+                return new int[] {Command.INT, Command.PLAIN_TEXT};
             }
         },
         rm {
@@ -35,34 +36,34 @@ public class regex extends ParamCommand {
             public String exec(ExecutePack pack) {
                 String output = RegexManager.instance.rm(pack.getInt());
                 if(output == null) return null;
-                if(output.length() == 0) return pack.context.getString(R.string.id_notfound);
+                if(output.isEmpty()) return pack.context.getString(R.string.id_not_found);
                 return output;
             }
 
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.INT};
+                return new int[] {Command.INT};
             }
         },
         get {
             @Override
             public String exec(ExecutePack pack) {
                 RegexManager.Regex r = RegexManager.instance.get(pack.getInt());
-                if(r == null) return pack.context.getString(R.string.id_notfound);
+                if(r == null) return pack.context.getString(R.string.id_not_found);
 
                 return r.regex != null ? r.regex.pattern() : r.literalPattern;
             }
 
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.INT};
+                return new int[] {Command.INT};
             }
         },
         test {
             @Override
             public String exec(ExecutePack pack) {
                 CharSequence s = RegexManager.instance.test(pack.getInt(), pack.getString());
-                if(s.length() == 0) return pack.context.getString(R.string.id_notfound);
+                if(s.length() == 0) return pack.context.getString(R.string.id_not_found);
 
                 Tuils.sendOutput(pack.context, s);
                 return null;
@@ -70,7 +71,7 @@ public class regex extends ParamCommand {
 
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.INT, CommandAbstraction.PLAIN_TEXT};
+                return new int[] {Command.INT, Command.PLAIN_TEXT};
             }
         };
 

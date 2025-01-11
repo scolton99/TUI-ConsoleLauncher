@@ -146,8 +146,8 @@ public class FileManager {
     }
 
     public static class DirInfo {
-        public File file;
-        public String notFound;
+        public final File file;
+        public final String notFound;
 
         public DirInfo(File f, String nF) {
             this.file = f;
@@ -170,8 +170,8 @@ public class FileManager {
             this.name = name;
             this.extension = extension;
 
-            allNames = name.length() == 0 || name.equals(ASTERISK);
-            allExtensions = extension.length() == 0 || extension.equals(ASTERISK);
+            allNames = name.isEmpty() || name.equals(ASTERISK);
+            allExtensions = extension.isEmpty() || extension.equals(ASTERISK);
         }
 
         public WildcardInfo(boolean all) {

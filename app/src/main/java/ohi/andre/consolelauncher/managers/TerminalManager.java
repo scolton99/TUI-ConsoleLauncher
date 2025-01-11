@@ -57,24 +57,24 @@ public class TerminalManager {
 
     public static final int CATEGORY_INPUT = 10, CATEGORY_OUTPUT = 11, CATEGORY_NO_COLOR = 20;
 
-    public static int NO_COLOR = Integer.MAX_VALUE;
+    public static final int NO_COLOR = Integer.MAX_VALUE;
 
     private long lastEnter;
 
-    private String prefix;
-    private String suPrefix;
+    private final String prefix;
+    private final String suPrefix;
 
-    private ScrollView mScrollView;
-    private TextView mTerminalView;
-    private EditText mInputView;
+    private final ScrollView mScrollView;
+    private final TextView mTerminalView;
+    private final EditText mInputView;
 
-    private TextView mPrefix;
+    private final TextView mPrefix;
     private boolean suMode;
 
-    private List<String> cmdList = new ArrayList<>(CMD_LIST_SIZE);
+    private final List<String> cmdList = new ArrayList<>(CMD_LIST_SIZE);
     private int howBack = -1;
 
-    private Runnable mScrollRunnable = new Runnable() {
+    private final Runnable mScrollRunnable = new Runnable() {
         @Override
         public void run() {
             mScrollView.fullScroll(ScrollView.FOCUS_DOWN);
@@ -82,14 +82,16 @@ public class TerminalManager {
         }
     };
 
-    private MainPack mainPack;
+    private final MainPack mainPack;
 
     private boolean defaultHint = true;
 
     private int clearCmdsCount= 0;
 
-    private int clearAfterCmds, clearAfterMs, maxLines;
-    private Runnable clearRunnable = new Runnable() {
+    private final int clearAfterCmds;
+    private final int clearAfterMs;
+    private final int maxLines;
+    private final Runnable clearRunnable = new Runnable() {
 
         @Override
         public void run() {
@@ -98,14 +100,17 @@ public class TerminalManager {
         }
     };
 
-    private String inputFormat, outputFormat;
-    private int inputColor, outputColor;
+    private final String inputFormat;
+    private final String outputFormat;
+    private final int inputColor;
+    private final int outputColor;
 
-    private boolean clickCommands, longClickCommands;
+    private final boolean clickCommands;
+    private final boolean longClickCommands;
 
     public Context mContext;
 
-    private CommandExecuter executer;
+    private final CommandExecuter executer;
 
     public TerminalManager(final TextView terminalView, EditText inputView, TextView prefixView, ImageView submitView, final ImageView backView, ImageButton nextView, ImageButton deleteView,
                            ImageButton pasteView, final Context context, MainPack mainPack, CommandExecuter executer) {
@@ -160,7 +165,7 @@ public class TerminalManager {
             pasteView.setColorFilter(XMLPrefsManager.getColor(Theme.toolbar_color));
             pasteView.setOnClickListener(v -> {
                 String text = Tuils.getTextFromClipboard(context);
-                if(text != null && text.length() > 0) {
+                if(text != null && !text.isEmpty()) {
                     setInput(getInput() + text);
                 }
             });
@@ -168,7 +173,7 @@ public class TerminalManager {
 
         if (deleteView != null) {
             deleteView.setColorFilter(XMLPrefsManager.getColor(Theme.toolbar_color));
-            deleteView.setOnClickListener(v -> setInput(Tuils.EMPTYSTRING));
+            deleteView.setOnClickListener(v -> setInput(Tuils.EMPTY_STRING));
         }
 
         this.mTerminalView = terminalView;
@@ -270,7 +275,7 @@ public class TerminalManager {
 //                @Override
 //                public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
 //                    if (dstart == 0 && dend == 0 && start == 0 && end == 1 && source.length() > 0) {
-//                        return TextUtils.concat(source.toString().toLowerCase().charAt(0) + Tuils.EMPTYSTRING, source.subSequence(1,source.length()));
+//                        return TextUtils.concat(source.toString().toLowerCase().charAt(0) + Tuils.EMPTY_STRING, source.subSequence(1,source.length()));
 //                    }
 //
 //                    return source;
@@ -280,7 +285,7 @@ public class TerminalManager {
     }
 
     private void setupNewInput() {
-        mInputView.setText(Tuils.EMPTYSTRING);
+        mInputView.setText(Tuils.EMPTY_STRING);
 
         if(defaultHint) {
             mInputView.setHint(Tuils.getHint(mainPack.currentDirectory.getAbsolutePath()));
@@ -289,9 +294,9 @@ public class TerminalManager {
         requestInputFocus();
     }
 
-    private boolean onNewInput() {
+    private void onNewInput() {
         if (mInputView == null) {
-            return false;
+            return;
         }
 
         CharSequence input = mInputView.getText();
@@ -338,7 +343,6 @@ public class TerminalManager {
 
         setupNewInput();
 
-        return true;
     }
 
     public void setOutput(CharSequence output, int type) {
@@ -366,7 +370,7 @@ public class TerminalManager {
     }
 
     public void onBackPressed() {
-        if(cmdList.size() > 0) {
+        if(!cmdList.isEmpty()) {
 
             if(howBack == -1) {
                 howBack = cmdList.size();
@@ -385,7 +389,7 @@ public class TerminalManager {
 
             String input;
             if(howBack == cmdList.size()) {
-                input = Tuils.EMPTYSTRING;
+                input = Tuils.EMPTY_STRING;
             } else {
                 input = cmdList.get(howBack);
             }
@@ -497,6 +501,10 @@ public class TerminalManager {
         mScrollView.postDelayed(mScrollRunnable, SCROLL_DELAY);
     }
 
+    public void scrollToEndImmediate() {
+        mScrollView.post(mScrollRunnable);
+    }
+
     public void requestInputFocus() {
         mInputView.requestFocus();
     }
@@ -510,7 +518,7 @@ public class TerminalManager {
     }
 
     public void clear() {
-        mTerminalView.post(() -> mTerminalView.setText(Tuils.EMPTYSTRING));
+        mTerminalView.post(() -> mTerminalView.setText(Tuils.EMPTY_STRING));
         cmdList.clear();
         clearCmdsCount = 0;
     }

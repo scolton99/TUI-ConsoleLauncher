@@ -8,7 +8,8 @@ import android.net.Uri;
 import java.util.List;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand;
@@ -35,7 +36,8 @@ public class search extends ParamCommand {
             @Override
             public String exec(ExecutePack pack) {
                 List<String> args = pack.getList();
-                return playstore(args, pack.context);
+                playstore(args, pack.context);
+                return Tuils.EMPTY_STRING;
             }
         },
 //        file {
@@ -50,34 +52,38 @@ public class search extends ParamCommand {
             @Override
             public String exec(ExecutePack pack) {
                 List<String> args = pack.getList();
-                return google(args, pack.context);
+                google(args, pack.context);
+                return Tuils.EMPTY_STRING;
             }
         },
         yt {
             @Override
             public String exec(ExecutePack pack) {
                 List<String> args = pack.getList();
-                return youTube(args, pack.context);
+                youTube(args, pack.context);
+                return Tuils.EMPTY_STRING;
             }
         },
         u {
             @Override
             public String exec(ExecutePack pack) {
                 List<String> args = pack.getList();
-                return url(Tuils.toPlanString(args, Tuils.SPACE), pack.context);
+                url(Tuils.toPlanString(args, Tuils.SPACE), pack.context);
+                return Tuils.EMPTY_STRING;
             }
         },
         dd {
             @Override
             public String exec(ExecutePack pack) {
                 List<String> args = pack.getList();
-                return duckDuck(args, pack.context);
+                duckDuck(args, pack.context);
+                return Tuils.EMPTY_STRING;
             }
         };
 
         @Override
         public int[] args() {
-            return new int[] {CommandAbstraction.TEXTLIST};
+            return new int[] {Command.TEXTLIST};
         }
 
         static Param get(String p) {
@@ -136,7 +142,7 @@ public class search extends ParamCommand {
         return Param.labels();
     }
 
-    private static String google(List<String> args, Context c) {
+    private static void google(List<String> args, Context c) {
 
         try {
             String toSearch = Tuils.toPlanString(args, " ");
@@ -152,11 +158,9 @@ public class search extends ParamCommand {
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             c.startActivity(intent);
         }
-
-        return Tuils.EMPTYSTRING;
     }
 
-    private static String playstore(List<String> args, Context c) {
+    private static void playstore(List<String> args, Context c) {
         String toSearch = Tuils.toPlanString(args, "%20");
 
         try {
@@ -164,11 +168,9 @@ public class search extends ParamCommand {
         } catch (android.content.ActivityNotFoundException anfe) {
             c.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(PLAYSTORE_BROWSER_PREFIX + toSearch)));
         }
-
-        return Tuils.EMPTYSTRING;
     }
 
-    private static String url(String url, Context c) {
+    private static void url(String url, Context c) {
         if (!url.startsWith("http://") && !url.startsWith("https://")) {
             url = "http://" + url;
         }
@@ -176,11 +178,9 @@ public class search extends ParamCommand {
         Uri uri = Uri.parse(url);
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         c.startActivity(intent);
-
-        return Tuils.EMPTYSTRING;
     }
 
-    private static String duckDuck(List<String> args, Context c) {
+    private static void duckDuck(List<String> args, Context c) {
         try {
             String toSearch = Tuils.toPlanString(args, " ");
 
@@ -195,7 +195,6 @@ public class search extends ParamCommand {
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             c.startActivity(intent);
         }
-        return Tuils.EMPTYSTRING;
     }
 
 //    private static String file(final List<String> args, final File cd, final Resources res, final Outputable outputable) {
@@ -214,7 +213,7 @@ public class search extends ParamCommand {
 //            }
 //        };
 //
-//        return Tuils.EMPTYSTRING;
+//        return Tuils.EMPTY_STRING;
 //    }
 //
 //    private static List<String> rightPaths(File dir, String name) {
@@ -240,7 +239,7 @@ public class search extends ParamCommand {
 //        return f.getName().equalsIgnoreCase(name);
 //    }
 
-    private static String youTube(List<String> args, Context c) {
+    private static void youTube(List<String> args, Context c) {
         try {
             String toSearch = Tuils.toPlanString(args, " ");
             Intent intent = new Intent(Intent.ACTION_SEARCH);
@@ -254,7 +253,6 @@ public class search extends ParamCommand {
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             c.startActivity(intent);
         }
-        return Tuils.EMPTYSTRING;
     }
 
     @Override

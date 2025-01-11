@@ -2,13 +2,13 @@ package ohi.andre.consolelauncher.commands.main.raw;
 
 import android.content.Intent;
 import android.os.Build;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
-import ohi.andre.consolelauncher.commands.main.specific.APICommand;
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand;
 import ohi.andre.consolelauncher.managers.notifications.reply.ReplyManager;
 import ohi.andre.consolelauncher.tuils.Tuils;
@@ -17,14 +17,14 @@ import ohi.andre.consolelauncher.tuils.Tuils;
  * Created by francescoandreuzzi on 05/11/2017.
  */
 
-public class reply extends ParamCommand implements APICommand {
+public class reply extends ParamCommand {
 
-    private enum Param implements ohi.andre.consolelauncher.commands.main.Param {
+    protected enum Param implements ohi.andre.consolelauncher.commands.main.Param {
 
         to {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.BOUND_REPLY_APP, CommandAbstraction.PLAIN_TEXT};
+                return new int[] {Command.BOUND_REPLY_APP, Command.PLAIN_TEXT};
             }
 
             @Override
@@ -41,7 +41,7 @@ public class reply extends ParamCommand implements APICommand {
         bind {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.VISIBLE_PACKAGE};
+                return new int[] {Command.VISIBLE_PACKAGE};
             }
 
             @Override
@@ -54,7 +54,7 @@ public class reply extends ParamCommand implements APICommand {
         check {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.BOUND_REPLY_APP};
+                return new int[] {Command.BOUND_REPLY_APP};
             }
 
             @Override
@@ -69,7 +69,7 @@ public class reply extends ParamCommand implements APICommand {
         unbind {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.VISIBLE_PACKAGE};
+                return new int[] {Command.VISIBLE_PACKAGE};
             }
 
             @Override
@@ -77,7 +77,7 @@ public class reply extends ParamCommand implements APICommand {
                 String output = ReplyManager.unbind(pack.getLaunchInfo().componentName.getPackageName());
                 LocalBroadcastManager.getInstance(pack.context).sendBroadcast(new Intent(ReplyManager.ACTION_UPDATE));
 
-                if(output != null && output.length() == 0) return pack.context.getString(R.string.reply_app_not_found) + pack.getLaunchInfo().componentName.getPackageName();
+                if(output != null && output.isEmpty()) return pack.context.getString(R.string.reply_app_not_found) + pack.getLaunchInfo().componentName.getPackageName();
                 return output;
             }
         },

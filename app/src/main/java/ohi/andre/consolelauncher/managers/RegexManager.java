@@ -48,7 +48,7 @@ public class RegexManager {
                 try {
                     File root = Tuils.getFolder();
                     if(root == null) {
-                        Tuils.sendOutput(Color.RED, context, R.string.tuinotfound_rss);
+                        Tuils.sendOutput(Color.RED, context, context.getString(R.string.tui_folder_not_found, "rss"));
                         return;
                     }
 
@@ -99,7 +99,7 @@ public class RegexManager {
 
                         busyIds.add(id);
 
-                        if(value != null && value.length() > 0) {
+                        if(value != null && !value.isEmpty()) {
                             regexes.add(new Regex(value, id));
                         }
                     }
@@ -136,7 +136,7 @@ public class RegexManager {
 //    "": used id
     public String add(int id, String value) {
         for(int c = 0; c < regexes.size(); c++) {
-            if(regexes.get(c).id == id) return Tuils.EMPTYSTRING;
+            if(regexes.get(c).id == id) return Tuils.EMPTY_STRING;
         }
 
         regexes.add(new Regex(value, id));
@@ -184,7 +184,7 @@ public class RegexManager {
                 rmFromList(id);
                 return null;
             }
-            else return Tuils.EMPTYSTRING;
+            else return Tuils.EMPTY_STRING;
         } catch (Exception e) {
             return e.toString();
         }
@@ -192,7 +192,7 @@ public class RegexManager {
 
     public CharSequence test(int id, String test) {
         Regex regex = get(id);
-        if(regex == null) return Tuils.EMPTYSTRING;
+        if(regex == null) return Tuils.EMPTY_STRING;
 
         if(regex.regex == null) return "null";
         Matcher m = regex.regex.matcher(test);

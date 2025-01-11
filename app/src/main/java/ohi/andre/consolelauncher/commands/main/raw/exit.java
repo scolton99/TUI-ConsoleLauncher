@@ -1,7 +1,8 @@
 package ohi.andre.consolelauncher.commands.main.raw;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.tuils.Tuils;
 
@@ -9,7 +10,7 @@ import ohi.andre.consolelauncher.tuils.Tuils;
  * Created by francescoandreuzzi on 21/05/2017.
  */
 
-public class exit implements CommandAbstraction {
+public class exit extends AbstractCommand {
     @Override
     public String exec(ExecutePack pack) throws Exception {
         Tuils.resetPreferredLauncherAndOpenChooser(pack.context);

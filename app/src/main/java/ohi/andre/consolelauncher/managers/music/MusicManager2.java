@@ -35,7 +35,7 @@ public class MusicManager2 implements MediaController.MediaPlayerControl {
 
     final int WAITING_NEXT = 10, WAITING_PREVIOUS = 11, WAITING_PLAY = 12, WAITING_LISTEN = 13;
 
-    Context mContext;
+    final Context mContext;
 
     List<Song> songs;
 
@@ -50,7 +50,7 @@ public class MusicManager2 implements MediaController.MediaPlayerControl {
     int waitingMethod = 0;
     String savedParam;
 
-    BroadcastReceiver headsetBroadcast;
+    final BroadcastReceiver headsetBroadcast;
 
     public MusicManager2(Context c) {
         mContext = c;
@@ -141,12 +141,10 @@ public class MusicManager2 implements MediaController.MediaPlayerControl {
         musicSrv.pausePlayer();
     }
 
-    public String play() {
+    public void play() {
         if(!musicBound) {
             init();
             waitingMethod = WAITING_PLAY;
-
-            return null;
         }
 
         if(stopped) {
@@ -157,12 +155,10 @@ public class MusicManager2 implements MediaController.MediaPlayerControl {
             playbackPaused = false;
             musicSrv.playPlayer();
         } else pause();
-
-        return null;
     }
 
     public String lsSongs() {
-        if(songs.size() == 0) return "[]";
+        if(songs.isEmpty()) return "[]";
 
         List<String> ss = new ArrayList<>();
         for(Song s : songs) {
@@ -201,7 +197,7 @@ public class MusicManager2 implements MediaController.MediaPlayerControl {
                         musicCursor.close();
                     } else {
                         String path = XMLPrefsManager.get(Behavior.songs_folder);
-                        if(path.length() == 0) return;
+                        if(path.isEmpty()) return;
 
                         File file;
                         if(path.startsWith(File.separator)) {
@@ -224,7 +220,7 @@ public class MusicManager2 implements MediaController.MediaPlayerControl {
         loader.start();
     }
 
-    private ServiceConnection musicConnection = new ServiceConnection(){
+    private final ServiceConnection musicConnection = new ServiceConnection(){
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {

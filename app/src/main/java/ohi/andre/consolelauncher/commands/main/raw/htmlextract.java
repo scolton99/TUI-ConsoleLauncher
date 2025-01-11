@@ -1,12 +1,13 @@
 package ohi.andre.consolelauncher.commands.main.raw;
 
 import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.io.File;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand;
@@ -25,7 +26,7 @@ public class htmlextract extends ParamCommand {
         query {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.INT, CommandAbstraction.INT, CommandAbstraction.PLAIN_TEXT};
+                return new int[] {Command.INT, Command.INT, Command.PLAIN_TEXT};
             }
 
             @Override
@@ -60,13 +61,13 @@ public class htmlextract extends ParamCommand {
                     return null;
                 }
 
-                return pack.context.getString(R.string.help_htmlextract);
+                return pack.context.getString(R.string.help_html_extract);
             }
         },
         add {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.DATASTORE_PATH_TYPE, CommandAbstraction.INT, CommandAbstraction.PLAIN_TEXT};
+                return new int[] {Command.DATASTORE_PATH_TYPE, Command.INT, Command.PLAIN_TEXT};
             }
 
             @Override
@@ -83,14 +84,14 @@ public class htmlextract extends ParamCommand {
 
             @Override
             public String onArgNotFound(ExecutePack pack, int index) {
-                if(index == 1) return pack.context.getString(R.string.invalid_datastoretype);
+                if(index == 1) return pack.context.getString(R.string.invalid_data_store_type);
                 return super.onArgNotFound(pack, index);
             }
         },
         rm {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.INT};
+                return new int[] {Command.INT};
             }
 
             @Override
@@ -106,7 +107,7 @@ public class htmlextract extends ParamCommand {
         edit {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.INT, CommandAbstraction.PLAIN_TEXT};
+                return new int[] {Command.INT, Command.PLAIN_TEXT};
             }
 
             @Override
@@ -123,7 +124,7 @@ public class htmlextract extends ParamCommand {
         ls {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.DATASTORE_PATH_TYPE};
+                return new int[] {Command.DATASTORE_PATH_TYPE};
             }
 
             @Override
@@ -147,7 +148,7 @@ public class htmlextract extends ParamCommand {
 
             @Override
             public String onArgNotFound(ExecutePack pack, int index) {
-                return pack.context.getString(R.string.invalid_datastoretype);
+                return pack.context.getString(R.string.invalid_data_store_type);
             }
         },
         tutorial {
@@ -201,7 +202,7 @@ public class htmlextract extends ParamCommand {
 
         @Override
         public String onNotArgEnough(ExecutePack pack, int n) {
-            return pack.context.getString(R.string.help_htmlextract);
+            return pack.context.getString(R.string.help_html_extract);
         }
 
         @Override
@@ -232,6 +233,6 @@ public class htmlextract extends ParamCommand {
 
     @Override
     public int helpRes() {
-        return R.string.help_htmlextract;
+        return R.string.help_html_extract;
     }
 }

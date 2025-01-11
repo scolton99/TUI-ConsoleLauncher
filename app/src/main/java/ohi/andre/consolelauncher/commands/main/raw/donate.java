@@ -18,11 +18,12 @@ import android.content.Intent;
 import android.net.Uri;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 
-public class donate implements CommandAbstraction {
+public class donate extends AbstractCommand {
 
     private final String DONATE_URL = "https://www.paypal.me/fandreuzzi";
 

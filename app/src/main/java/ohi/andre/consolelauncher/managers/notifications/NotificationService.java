@@ -1,9 +1,5 @@
 package ohi.andre.consolelauncher.managers.notifications;
 
-/**
- * Created by francescoandreuzzi on 27/04/2017.
- */
-
 import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.content.Intent;
@@ -16,7 +12,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
-import android.support.v4.app.NotificationCompat;
+import androidx.core.app.NotificationCompat;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
@@ -39,19 +35,21 @@ import ohi.andre.consolelauncher.managers.xml.options.Notifications;
 import ohi.andre.consolelauncher.tuils.StoppableThread;
 import ohi.andre.consolelauncher.tuils.Tuils;
 
-
+/**
+ * Created by francescoandreuzzi on 27/04/2017.
+ */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class NotificationService extends NotificationListenerService {
 
     public static final String DESTROY = "destroy";
 
     private final int UPDATE_TIME = 2000;
-    private String LINES_LABEL = "Lines";
-    private String ANDROID_LABEL_PREFIX = "android.";
-    private String NULL_LABEL = "null";
+    private final String LINES_LABEL = "Lines";
+    private final String ANDROID_LABEL_PREFIX = "android.";
+    private final String NULL_LABEL = "null";
 
     HashMap<String, List<Notification>> pastNotifications;
-    Handler handler = new Handler();
+    final Handler handler = new Handler();
 
     String format;
     int color, maxOptionalDepth;
@@ -152,12 +150,12 @@ public class NotificationService extends NotificationListenerService {
                                         String color = m.group(2);
                                         String value = m.group(3);
 
-                                        if(value == null || value.length() == 0) value = m.group(4);
+                                        if(value == null || value.isEmpty()) value = m.group(4);
 
                                         if(value != null) value = value.trim();
                                         else continue;
 
-                                        if(value.length() == 0) continue;
+                                        if(value.isEmpty()) continue;
 
                                         if(value.equals("ttl")) value = "title";
                                         else if(value.equals("txt")) value = "text";
@@ -167,7 +165,7 @@ public class NotificationService extends NotificationListenerService {
                                         if(value.endsWith(":")) {
                                             split = new String[temp.length + 1];
                                             System.arraycopy(temp, 0, split, 0, temp.length);
-                                            split[split.length - 1] = Tuils.EMPTYSTRING;
+                                            split[split.length - 1] = Tuils.EMPTY_STRING;
                                         } else split = temp;
 
 //                                    because the last one is the default text, but only if there is more than one label
@@ -346,13 +344,6 @@ public class NotificationService extends NotificationListenerService {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-//        ondestroy won't ever be called
-    }
-
-    @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
         if(!enabled) return;
 
@@ -375,9 +366,10 @@ public class NotificationService extends NotificationListenerService {
     public void onNotificationRemoved(StatusBarNotification sbn) {}
 
     public static class Notification implements Parcelable {
-        public long time;
-        public String text, pkg;
-        public PendingIntent pendingIntent;
+        public final long time;
+        public final String text;
+        public final String pkg;
+        public final PendingIntent pendingIntent;
 
         public Notification(long time, String text, String pkg, PendingIntent pi) {
             this.time = time;

@@ -1,11 +1,12 @@
 package ohi.andre.consolelauncher.commands.main.raw;
 
 import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import ohi.andre.consolelauncher.R;
 import ohi.andre.consolelauncher.UIManager;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand;
@@ -22,7 +23,7 @@ import ohi.andre.consolelauncher.tuils.interfaces.Reloadable;
 
 public class tuiweather extends ParamCommand {
 
-    private enum Param implements ohi.andre.consolelauncher.commands.main.Param {
+    protected enum Param implements ohi.andre.consolelauncher.commands.main.Param {
 
         update {
             @Override
@@ -72,7 +73,7 @@ public class tuiweather extends ParamCommand {
         set_key {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.PLAIN_TEXT};
+                return new int[] {Command.PLAIN_TEXT};
             }
 
             @Override
@@ -119,7 +120,7 @@ public class tuiweather extends ParamCommand {
 
         @Override
         public String onArgNotFound(ExecutePack pack, int index) {
-            return pack.context.getString(R.string.output_appnotfound);
+            return pack.context.getString(R.string.output_app_not_found);
         }
     }
 

@@ -6,7 +6,8 @@ package ohi.andre.consolelauncher.managers.xml.classes;
 
 public class XMLPrefsEntry {
 
-    public String key, value;
+    public final String key;
+    public final String value;
 
     public XMLPrefsEntry(String key, String value) {
         this.key = key;

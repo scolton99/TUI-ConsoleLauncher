@@ -24,7 +24,7 @@ import okhttp3.Response;
 
 public class ChangelogManager {
 
-    private static String PREFS_NAME = "changelogPrefs";
+    private static final String PREFS_NAME = "changelogPrefs";
 
     public static void printLog(final Context context, final OkHttpClient client) {
         printLog(context, client, false);

@@ -13,8 +13,8 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.RemoteInput;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.RemoteInput;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -37,7 +37,7 @@ public class MusicService extends Service implements
     private List<Song> songs;
     private int songPosn;
     private final IBinder musicBind = new MusicBinder();
-    private String songTitle = Tuils.EMPTYSTRING;
+    private String songTitle = Tuils.EMPTY_STRING;
     private boolean shuffle=false;
 
     private long lastNotificationChange;
@@ -55,7 +55,7 @@ public class MusicService extends Service implements
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if(System.currentTimeMillis() - lastNotificationChange < 500 || songTitle == null || songTitle.length() == 0) return super.onStartCommand(intent, flags, startId);
+        if(System.currentTimeMillis() - lastNotificationChange < 500 || songTitle == null || songTitle.isEmpty()) return super.onStartCommand(intent, flags, startId);
 
         lastNotificationChange = System.currentTimeMillis();
         startForeground(NOTIFY_ID, buildNotification(this.getApplicationContext(), songTitle));
@@ -65,7 +65,7 @@ public class MusicService extends Service implements
 
     @Override
     public void onPrepared(MediaPlayer mp) {
-        if(songTitle == null || songTitle.length() == 0) return;
+        if(songTitle == null || songTitle.isEmpty()) return;
 
         lastNotificationChange = System.currentTimeMillis();
 
@@ -160,7 +160,7 @@ public class MusicService extends Service implements
 
     public static Notification buildNotification(Context context, String songTitle) {
         Intent notIntent = new Intent(context, LauncherActivity.class);
-        PendingIntent pendInt = PendingIntent.getActivity(context, 0, notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendInt = PendingIntent.getActivity(context, 0, notIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         Notification not;
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
@@ -181,7 +181,7 @@ public class MusicService extends Service implements
             i.putExtra(MainManager.MUSIC_SERVICE, true);
 
             NotificationCompat.Action action = new NotificationCompat.Action.Builder(R.mipmap.ic_launcher, label,
-                    PendingIntent.getBroadcast(context.getApplicationContext(), 10, i, PendingIntent.FLAG_UPDATE_CURRENT))
+                    PendingIntent.getBroadcast(context.getApplicationContext(), 10, i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE))
                     .addRemoteInput(remoteInput)
                     .build();
 
@@ -235,13 +235,13 @@ public class MusicService extends Service implements
     }
 
     public String playPrev(){
-        if(songs.size() == 0) return getString(R.string.no_songs);
+        if(songs.isEmpty()) return getString(R.string.no_songs);
         songPosn = previous();
         return playSong();
     }
 
     public String playNext() {
-        if(songs.size() == 0) return getString(R.string.no_songs);
+        if(songs.isEmpty()) return getString(R.string.no_songs);
         songPosn = next();
         return playSong();
     }

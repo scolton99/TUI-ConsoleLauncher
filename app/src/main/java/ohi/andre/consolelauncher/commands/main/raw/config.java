@@ -9,7 +9,8 @@ import java.util.List;
 
 import ohi.andre.consolelauncher.R;
 import ohi.andre.consolelauncher.UIManager;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand;
@@ -40,7 +41,7 @@ public class config extends ParamCommand {
         set {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.CONFIG_ENTRY, CommandAbstraction.PLAIN_TEXT};
+                return new int[] {Command.CONFIG_ENTRY, Command.PLAIN_TEXT};
             }
 
             @Override
@@ -52,7 +53,7 @@ public class config extends ParamCommand {
                 ((Reloadable) pack.context).addMessage(save.parent().path(), save.label() + " -> " + value);
 
                 if(save.label().startsWith("default_app_n")) {
-                    return pack.context.getString(R.string.output_usedefapp);
+                    return pack.context.getString(R.string.output_use_default_app);
                 } else if(save == Behavior.unlock_counter_cycle_start) {
                     SharedPreferences preferences = pack.context.getSharedPreferences(PREFS_NAME, 0);
                     preferences.edit()
@@ -66,14 +67,14 @@ public class config extends ParamCommand {
 
             @Override
             public String onNotArgEnough(ExecutePack pack, int n) {
-                pack.args = new Object[] {pack.args[1], Tuils.EMPTYSTRING};
+                pack.args = new Object[] {pack.args[1], Tuils.EMPTY_STRING};
                 return set.exec(pack);
             }
         },
         info {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.CONFIG_ENTRY};
+                return new int[] {Command.CONFIG_ENTRY};
             }
 
             @Override
@@ -88,7 +89,7 @@ public class config extends ParamCommand {
         file {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.CONFIG_FILE};
+                return new int[] {Command.CONFIG_FILE};
             }
 
             @Override
@@ -110,13 +111,13 @@ public class config extends ParamCommand {
 
             @Override
             public String onArgNotFound(ExecutePack pack, int index) {
-                return pack.context.getString(R.string.output_filenotfound);
+                return pack.context.getString(R.string.output_file_not_found);
             }
         },
         append {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.CONFIG_ENTRY, CommandAbstraction.PLAIN_TEXT};
+                return new int[] {Command.CONFIG_ENTRY, Command.PLAIN_TEXT};
             }
 
             @Override
@@ -133,20 +134,20 @@ public class config extends ParamCommand {
 
             @Override
             public String onNotArgEnough(ExecutePack pack, int n) {
-                pack.args = new Object[] {pack.args[0], pack.args[1], Tuils.EMPTYSTRING};
+                pack.args = new Object[] {pack.args[0], pack.args[1], Tuils.EMPTY_STRING};
                 return set.exec(pack);
             }
         },
         erase {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.CONFIG_ENTRY};
+                return new int[] {Command.CONFIG_ENTRY};
             }
 
             @Override
             public String exec(ExecutePack pack) {
                 XMLPrefsSave save = pack.getPrefsSave();
-                save.parent().write(save, Tuils.EMPTYSTRING);
+                save.parent().write(save, Tuils.EMPTY_STRING);
 
                 ((Reloadable) pack.context).addMessage(save.parent().path(), save.label() + " -> " + "\"\"");
 
@@ -156,21 +157,21 @@ public class config extends ParamCommand {
         get {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.CONFIG_ENTRY};
+                return new int[] {Command.CONFIG_ENTRY};
             }
 
             @Override
             public String exec(ExecutePack pack) {
                 XMLPrefsSave save = pack.getPrefsSave();
                 String s = XMLPrefsManager.get(String.class, save);
-                if(s.length() == 0) return "\"\"";
+                if(s.isEmpty()) return "\"\"";
                 return s;
             }
         },
         ls {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.CONFIG_FILE};
+                return new int[] {Command.CONFIG_FILE};
             }
 
             @Override
@@ -213,7 +214,7 @@ public class config extends ParamCommand {
 
             @Override
             public String onArgNotFound(ExecutePack pack, int index) {
-                return pack.context.getString(R.string.output_filenotfound);
+                return pack.context.getString(R.string.output_file_not_found);
             }
 
             @Override
@@ -245,7 +246,7 @@ public class config extends ParamCommand {
         fontsize {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.INT};
+                return new int[] {Command.INT};
             }
 
             @Override
@@ -271,7 +272,7 @@ public class config extends ParamCommand {
         reset {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.CONFIG_ENTRY};
+                return new int[] {Command.CONFIG_ENTRY};
             }
 
             @Override
@@ -287,7 +288,7 @@ public class config extends ParamCommand {
         apply {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.FILE};
+                return new int[] {Command.FILE};
             }
 
             @Override
@@ -360,7 +361,7 @@ public class config extends ParamCommand {
 
         @Override
         public String onArgNotFound(ExecutePack pack, int index) {
-            return pack.context.getString(R.string.output_invalidarg);
+            return pack.context.getString(R.string.output_invalid_argument);
         }
     }
 

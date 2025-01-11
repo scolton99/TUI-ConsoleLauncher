@@ -1,10 +1,11 @@
 package ohi.andre.consolelauncher.commands.main.raw;
 
 import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand;
@@ -22,7 +23,7 @@ public class notes extends ParamCommand {
         add {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.PLAIN_TEXT};
+                return new int[] {Command.PLAIN_TEXT};
             }
 
             @Override
@@ -38,7 +39,7 @@ public class notes extends ParamCommand {
         rm {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.PLAIN_TEXT};
+                return new int[] {Command.PLAIN_TEXT};
             }
 
             @Override
@@ -54,7 +55,7 @@ public class notes extends ParamCommand {
         cp {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.PLAIN_TEXT};
+                return new int[] {Command.PLAIN_TEXT};
             }
 
             @Override
@@ -90,7 +91,7 @@ public class notes extends ParamCommand {
         lock {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.PLAIN_TEXT};
+                return new int[] {Command.PLAIN_TEXT};
             }
 
             @Override
@@ -107,7 +108,7 @@ public class notes extends ParamCommand {
         unlock {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.PLAIN_TEXT};
+                return new int[] {Command.PLAIN_TEXT};
             }
 
             @Override

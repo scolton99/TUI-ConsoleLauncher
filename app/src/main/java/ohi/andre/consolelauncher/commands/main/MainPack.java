@@ -20,7 +20,6 @@ import ohi.andre.consolelauncher.managers.flashlight.TorchManager;
 import ohi.andre.consolelauncher.managers.music.MusicManager2;
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
 import ohi.andre.consolelauncher.managers.xml.options.Behavior;
-import ohi.andre.consolelauncher.tuils.interfaces.Redirectator;
 import ohi.andre.consolelauncher.tuils.libsuperuser.ShellHolder;
 import okhttp3.OkHttpClient;
 
@@ -34,7 +33,7 @@ public class MainPack extends ExecutePack {
     public File currentDirectory;
 
     //	resources references
-    public Resources res;
+    public final Resources res;
 
     //	internet
     public WifiManager wifi;
@@ -45,31 +44,29 @@ public class MainPack extends ExecutePack {
     public Object connectMgr;
 
     //	contacts
-    public ContactManager contacts;
+    public final ContactManager contacts;
 
     //	music
-    public MusicManager2 player;
+    public final MusicManager2 player;
 
     //	apps & assocs
-    public AliasManager aliasManager;
-    public AppsManager appsManager;
+    public final AliasManager aliasManager;
+    public final AppsManager appsManager;
 
-    public CommandsPreferences cmdPrefs;
+    public final CommandsPreferences cmdPrefs;
 
     public String lastCommand;
 
-    public Redirectator redirectator;
-
     public ShellHolder shellHolder;
 
-    public RssManager rssManager;
+    public final RssManager rssManager;
 
-    public OkHttpClient client;
+    public final OkHttpClient client;
 
     public int commandColor = TerminalManager.NO_COLOR;
 
     public MainPack(Context context, CommandGroup commandGroup, AliasManager alMgr, AppsManager appmgr, MusicManager2 p,
-                    ContactManager c, Redirectator redirectator, RssManager rssManager, OkHttpClient client) {
+                    ContactManager c, RssManager rssManager, OkHttpClient client) {
         super(commandGroup);
 
         this.currentDirectory = XMLPrefsManager.get(File.class, Behavior.home_path);
@@ -89,8 +86,6 @@ public class MainPack extends ExecutePack {
 
         this.player = p;
         this.contacts = c;
-
-        this.redirectator = redirectator;
     }
 
     public void dispose() {

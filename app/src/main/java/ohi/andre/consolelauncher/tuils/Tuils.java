@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.tuils;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.ActivityManager.MemoryInfo;
@@ -30,8 +31,10 @@ import android.os.Parcelable;
 import android.os.Process;
 import android.os.StatFs;
 import android.provider.Settings;
-import android.support.v4.content.FileProvider;
-import android.support.v4.content.LocalBroadcastManager;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -111,16 +114,18 @@ public class Tuils {
     public static final String NEWLINE = "\n";
     public static final String TRIBLE_SPACE = "   ";
     public static final String DOT = ".";
-    public static final String EMPTYSTRING = "";
+    public static final String EMPTY_STRING = "";
     private static final String TUI_FOLDER = "t-ui";
     public static final String MINUS = "-";
 
-    public static Pattern patternNewline = Pattern.compile("%n", Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
+    public static final Pattern patternNewline = Pattern.compile("%n", Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
 
     private static Typeface globalTypeface = null;
     public static String fontPath = null;
 
-    static Pattern calculusPattern = Pattern.compile("([\\+\\-\\*\\/\\^])(\\d+\\.?\\d*)");
+    public static final String LOG_TAG = "T-UI";
+
+    static final Pattern calculusPattern = Pattern.compile("([\\+\\-\\*\\/\\^])(\\d+\\.?\\d*)");
     public static double textCalculus(double input, String text) {
         Matcher m = calculusPattern.matcher(text);
         while(m.find()) {
@@ -331,16 +336,16 @@ public class Tuils {
     }
 
     public static String convertStreamToString(java.io.InputStream is) {
-        if (is == null) return Tuils.EMPTYSTRING;
+        if (is == null) return Tuils.EMPTY_STRING;
 
         java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : Tuils.EMPTYSTRING;
+        return s.hasNext() ? s.next() : Tuils.EMPTY_STRING;
     }
 
     public static long download(InputStream in, File file) throws Exception {
         OutputStream out = new FileOutputStream(file, false);
 
-        byte data[] = new byte[1024];
+        byte[] data = new byte[1024];
 
         long bytes = 0;
 
@@ -537,7 +542,7 @@ public class Tuils {
 
     public static SpannableString span(Context context, int bgColor, int foreColor, CharSequence text, int size) {
         if(text == null) {
-            text = Tuils.EMPTYSTRING;
+            text = Tuils.EMPTY_STRING;
         }
 
         SpannableString spannableString;
@@ -566,7 +571,7 @@ public class Tuils {
 
     public static String inputStreamToString(InputStream is) {
         java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : Tuils.EMPTYSTRING;
+        return s.hasNext() ? s.next() : Tuils.EMPTY_STRING;
     }
 
 //    static final int WEATHER_TIMEOUT = 6000;
@@ -700,8 +705,8 @@ public class Tuils {
         dir.delete();
     }
 
-    public static boolean insertOld(File oldFile) {
-        if(oldFile == null || !oldFile.exists()) return false;
+    public static void insertOld(File oldFile) {
+        if(oldFile == null || !oldFile.exists()) return;
 
         String oldPath = oldFile.getAbsolutePath();
 
@@ -711,7 +716,9 @@ public class Tuils {
         File dest = new File(oldFolder, oldFile.getName());
         if(dest.exists()) dest.delete();
 
-        return oldFile.renameTo(dest) && new File(oldPath).delete();
+        if (oldFile.renameTo(dest)) {
+            new File(oldPath).delete();
+        }
     }
 
     public static File getOld(String name) {
@@ -731,10 +738,10 @@ public class Tuils {
         Tuils.log(g.getChildCount());
         for(int c = 0; c < g.getChildCount(); c++) deepView(g.getChildAt(c));
 
-        Tuils.log("end of parents of: " + v.toString());
+        Tuils.log("end of parents of: " + v);
     }
 
-    private static View.OnClickListener deepClickListener = v -> Tuils.log(v.toString());
+    private static final View.OnClickListener deepClickListener = v -> Tuils.log(v.toString());
 
     public static void deepClickView(View v) {
         v.setOnClickListener(deepClickListener);
@@ -888,7 +895,7 @@ public class Tuils {
     public static final int KILO = 3;
     public static final int BYTE = 4;
 
-    private static long total = -1;
+    private static final long total = -1;
 
     public static double freeRam(ActivityManager mgr, MemoryInfo info) {
         mgr.getMemoryInfo(info);
@@ -905,7 +912,7 @@ public class Tuils {
             String line;
             while((line = reader.readLine()) != null) {
                 if(line.startsWith("MemTotal")) {
-                    line = line.replaceAll("\\D+", Tuils.EMPTYSTRING);
+                    line = line.replaceAll("\\D+", Tuils.EMPTY_STRING);
                     return Long.parseLong(line);
                 }
             }
@@ -957,7 +964,7 @@ public class Tuils {
         if(filePath.equals(home)) {
             return "~";
         } else if(filePath.startsWith(home)) {
-            return "~" + filePath.replace(home, Tuils.EMPTYSTRING);
+            return "~" + filePath.replace(home, Tuils.EMPTY_STRING);
         } else {
             return filePath;
         }
@@ -995,22 +1002,22 @@ public class Tuils {
         return -1;
     }
 
-    static Pattern pd = Pattern.compile("%d", Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
-    static Pattern pu = Pattern.compile("%u", Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
-    static Pattern pp = Pattern.compile("%p", Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
+    static final Pattern pd = Pattern.compile("%d", Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
+    static final Pattern pu = Pattern.compile("%u", Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
+    static final Pattern pp = Pattern.compile("%p", Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
     public static String getHint(String currentPath) {
         if(!XMLPrefsManager.getBoolean(Ui.show_session_info)) return null;
 
         String format = XMLPrefsManager.get(Behavior.session_info_format);
-        if(format.length() == 0) return null;
+        if(format.isEmpty()) return null;
 
         String deviceName = XMLPrefsManager.get(Ui.deviceName);
-        if(deviceName == null || deviceName.length() == 0) {
+        if(deviceName == null || deviceName.isEmpty()) {
             deviceName = Build.DEVICE;
         }
 
         String username = XMLPrefsManager.get(Ui.username);
-        if(username == null) username = Tuils.EMPTYSTRING;
+        if(username == null) username = Tuils.EMPTY_STRING;
 
         format = pd.matcher(format).replaceAll(Matcher.quoteReplacement(deviceName));
         format = pu.matcher(format).replaceAll(Matcher.quoteReplacement(username));
@@ -1038,7 +1045,7 @@ public class Tuils {
 
             char c = st.charAt(0);
             if (current != c) {
-                s.add(count, (newLine ? NEWLINE : EMPTYSTRING) + c + (newLine ? NEWLINE : EMPTYSTRING));
+                s.add(count, (newLine ? NEWLINE : EMPTY_STRING) + c + (newLine ? NEWLINE : EMPTY_STRING));
                 current = c;
             }
         }
@@ -1057,10 +1064,10 @@ public class Tuils {
 
     public static String toPlanString(String[] strings, String separator) {
         if(strings == null) {
-            return Tuils.EMPTYSTRING;
+            return Tuils.EMPTY_STRING;
         }
 
-        String output = Tuils.EMPTYSTRING;
+        String output = Tuils.EMPTY_STRING;
         for (int count = 0; count < strings.length; count++) {
             output = output.concat(strings[count]);
             if (count < strings.length - 1) output = output.concat(separator);
@@ -1072,15 +1079,15 @@ public class Tuils {
         if (strings != null) {
             return Tuils.toPlanString(strings, Tuils.NEWLINE);
         }
-        return Tuils.EMPTYSTRING;
+        return Tuils.EMPTY_STRING;
     }
 
     public static String toPlanString(String separator, List strings) {
         if(strings == null) {
-            return Tuils.EMPTYSTRING;
+            return Tuils.EMPTY_STRING;
         }
 
-        String output = Tuils.EMPTYSTRING;
+        String output = Tuils.EMPTY_STRING;
         for (int count = 0; count < strings.size(); count++) {
             output = output.concat(strings.get(count).toString());
             if (count < strings.size() - 1) output = output.concat(separator);
@@ -1108,28 +1115,28 @@ public class Tuils {
     }
 
     public static void log(Object o) {
-//        Log.e("andre", Arrays.toString(Thread.currentThread().getStackTrace()));
+//        Log.e(LOG_TAG, Arrays.toString(Thread.currentThread().getStackTrace()));
 
         if(o instanceof Throwable) {
-            Log.e("andre", "", (Throwable) o);
+            Log.e(LOG_TAG, "", (Throwable) o);
         } else {
             String text;
             if(o instanceof Object[]) text = Arrays.toString((Object[]) o);
             else text = o.toString();
-            Log.e("andre", text);
+            Log.e(LOG_TAG, text);
         }
     }
 
     public static void log(Object o, Object o2) {
         if(o instanceof Object[] && o2 instanceof Object[]){
-            Log.e("andre", Arrays.toString((Object[]) o) + " -- " + Arrays.toString((Object[]) o2));
+            Log.e(LOG_TAG, Arrays.toString((Object[]) o) + " -- " + Arrays.toString((Object[]) o2));
         } else {
-            Log.e("andre", String.valueOf(o) + " -- " + String.valueOf(o2));
+            Log.e(LOG_TAG, o + " -- " + o2);
         }
     }
 
     public static void log(Object o, PrintStream to) {
-//        Log.e("andre", Arrays.toString(Thread.currentThread().getStackTrace()));
+//        Log.e(LOG_TAG, Arrays.toString(Thread.currentThread().getStackTrace()));
 
         if(o instanceof Throwable) {
             ((Throwable) o).printStackTrace(to);
@@ -1151,7 +1158,7 @@ public class Tuils {
             if(o instanceof Object[] && o2 instanceof Object[]){
                 to.write((Arrays.toString((Object[]) o) + " -- " + Arrays.toString((Object[]) o2)).getBytes());
             } else {
-                to.write((String.valueOf(o) + " -- " + String.valueOf(o2)).getBytes());
+                to.write((o + " -- " + o2).getBytes());
             }
         } catch (Exception e) {
             Tuils.log(e);
@@ -1175,7 +1182,7 @@ public class Tuils {
         try {
             RandomAccessFile f = new RandomAccessFile(new File(Tuils.getFolder(), "crash.txt"), "rw");
             f.seek(0);
-            f.write((new Date().toString() + Tuils.NEWLINE + Tuils.NEWLINE).getBytes());
+            f.write((new Date() + Tuils.NEWLINE + Tuils.NEWLINE).getBytes());
             OutputStream is = Channels.newOutputStream(f.getChannel());
             is.write(s.getBytes());
             f.write((Tuils.NEWLINE + Tuils.NEWLINE).getBytes());
@@ -1220,11 +1227,11 @@ public class Tuils {
             String[] object = new String[strings.size()];
             return Tuils.toPlanString(strings.toArray(object), separator);
         }
-        return Tuils.EMPTYSTRING;
+        return Tuils.EMPTY_STRING;
     }
 
     public static String filesToPlanString(List<File> files, String separator) {
-        if(files == null || files.size() == 0) {
+        if(files == null || files.isEmpty()) {
             return null;
         }
 
@@ -1245,7 +1252,7 @@ public class Tuils {
 
     public static String toPlanString(Object[] objs, String separator) {
         if(objs == null) {
-            return Tuils.EMPTYSTRING;
+            return Tuils.EMPTY_STRING;
         }
 
         StringBuilder output = new StringBuilder();
@@ -1258,7 +1265,7 @@ public class Tuils {
         return output.toString();
     }
 
-    static Pattern unnecessarySpaces = Pattern.compile("\\s{2,}");
+    static final Pattern unnecessarySpaces = Pattern.compile("\\s{2,}");
     public static String removeUnncesarySpaces(String string) {
         return unnecessarySpaces.matcher(string).replaceAll(Tuils.SPACE);
     }
@@ -1316,7 +1323,7 @@ public class Tuils {
     }
 
     public static boolean isNumber(String s) {
-        if(s == null || s.length() == 0) {
+        if(s == null || s.isEmpty()) {
             return false;
         }
 
@@ -1340,12 +1347,7 @@ public class Tuils {
 
         intent.setDataAndType(u, mimetype);
 
-        int flags;
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_PREFIX_URI_PERMISSION;
-        } else {
-            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
-        }
+        int flags = Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_PREFIX_URI_PERMISSION;
 
         intent.addFlags(flags);
 
@@ -1380,6 +1382,9 @@ public class Tuils {
     }
 
     private static File getTuiFolder() {
+        if (!Environment.isExternalStorageManager()) {
+
+        }
         File internalDir = Environment.getExternalStorageDirectory();
         return new File(internalDir, TUI_FOLDER);
     }
@@ -1526,13 +1531,16 @@ public class Tuils {
 
     private static final String SPACE_REGEXP = "\\s";
     public static String removeSpaces(String string) {
-        return string.replaceAll(SPACE_REGEXP, EMPTYSTRING);
+        return string.replaceAll(SPACE_REGEXP, EMPTY_STRING);
     }
 
     public static String getNetworkType(Context context) {
-        TelephonyManager mTelephonyManager = (TelephonyManager)
-                context.getSystemService(Context.TELEPHONY_SERVICE);
-        int networkType = mTelephonyManager.getNetworkType();
+        TelephonyManager mTelephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        int networkType = Integer.MIN_VALUE;
+
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED)
+            networkType = mTelephonyManager.getDataNetworkType();
+
         switch (networkType) {
             case TelephonyManager.NETWORK_TYPE_GPRS:
             case TelephonyManager.NETWORK_TYPE_EDGE:
@@ -1579,9 +1587,7 @@ public class Tuils {
 
     public static int nOfBytes(File file) {
         int count = 0;
-        try {
-            FileInputStream in = new FileInputStream(file);
-
+        try (FileInputStream in = new FileInputStream(file)) {
             while(in.read() != -1) count++;
 
             return count;
@@ -1592,16 +1598,15 @@ public class Tuils {
     }
 
     public static void sendXMLParseError(Context context, String PATH, SAXParseException e) {
+        String errorDetails = String.format(Locale.getDefault(), "File: %1$s%nMessage: %2$s%nLine: %3$d%nColumn: %4$d", e.getSystemId(), e.getMessage(), e.getLineNumber(), e.getColumnNumber());
+
         Tuils.sendOutput(
                 Color.RED,
-                context, context.getString(R.string.output_xmlproblem1) + Tuils.SPACE + PATH + context.getString(R.string.output_xmlproblem2) + Tuils.NEWLINE + context.getString(R.string.output_errorlabel) +
-                "File: " + e.getSystemId() + Tuils.NEWLINE +
-                "Message" + e.getMessage() + Tuils.NEWLINE +
-                "Line" + e.getLineNumber() + Tuils.NEWLINE +
-                "Column" + e.getColumnNumber());
+                context,
+                context.getString(R.string.output_xml_error, PATH) + Tuils.NEWLINE + context.getString(R.string.output_xml_error_details, errorDetails));
     }
 
     public static void sendXMLParseError(Context context, String PATH) {
-        Tuils.sendOutput(Color.RED, context, context.getString(R.string.output_xmlproblem1) + Tuils.SPACE + PATH + context.getString(R.string.output_xmlproblem2));
+        Tuils.sendOutput(Color.RED, context, context.getString(R.string.output_xml_error, PATH));
     }
 }

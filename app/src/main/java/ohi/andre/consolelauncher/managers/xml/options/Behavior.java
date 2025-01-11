@@ -547,12 +547,12 @@ public enum Behavior implements XMLPrefsSave {
         @Override
         public String defaultValue() {
             String path = System.getenv("SECONDARY_STORAGE");
-            if(path == null) return Tuils.EMPTYSTRING;
+            if(path == null) return Tuils.EMPTY_STRING;
 
             File file = new File(path);
             if(file != null && file.exists()) return file.getAbsolutePath();
 
-            return Tuils.EMPTYSTRING;
+            return Tuils.EMPTY_STRING;
         }
 
         @Override

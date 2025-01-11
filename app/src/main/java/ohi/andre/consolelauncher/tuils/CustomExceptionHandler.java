@@ -6,7 +6,7 @@ package ohi.andre.consolelauncher.tuils;
 
 public class CustomExceptionHandler implements Thread.UncaughtExceptionHandler {
 
-    private Thread.UncaughtExceptionHandler _defaultEH;
+    private final Thread.UncaughtExceptionHandler _defaultEH;
 
     public CustomExceptionHandler(){
         _defaultEH = Thread.getDefaultUncaughtExceptionHandler();

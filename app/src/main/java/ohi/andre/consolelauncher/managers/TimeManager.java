@@ -9,6 +9,7 @@ import android.text.style.AbsoluteSizeSpan;
 import android.text.style.ForegroundColorSpan;
 
 import java.text.SimpleDateFormat;
+import java.util.AbstractMap;
 import java.util.Date;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -17,7 +18,6 @@ import java.util.regex.Pattern;
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
 import ohi.andre.consolelauncher.managers.xml.options.Behavior;
 import ohi.andre.consolelauncher.managers.xml.options.Theme;
-import ohi.andre.consolelauncher.tuils.SimpleMutableEntry;
 import ohi.andre.consolelauncher.tuils.Tuils;
 
 /**
@@ -28,7 +28,7 @@ public class TimeManager {
 
     Map.Entry<Integer, SimpleDateFormat>[] dateFormatList;
 
-    public static Pattern extractor = Pattern.compile("%t([0-9]*)", Pattern.CASE_INSENSITIVE);
+    public static final Pattern extractor = Pattern.compile("%t([0-9]*)", Pattern.CASE_INSENSITIVE);
 
     public static TimeManager instance;
 
@@ -49,10 +49,10 @@ public class TimeManager {
                 Matcher m = colorPattern.matcher(formats[c]);
                 if(m.find()) {
                     color = Color.parseColor(m.group());
-                    formats[c] = m.replaceAll(Tuils.EMPTYSTRING);
+                    formats[c] = m.replaceAll(Tuils.EMPTY_STRING);
                 }
 
-                dateFormatList[c] = new SimpleMutableEntry<>(color, new SimpleDateFormat(formats[c]));
+                dateFormatList[c] = new AbstractMap.SimpleEntry<>(color, new SimpleDateFormat(formats[c]));
             } catch (Exception e) {
                 Tuils.sendOutput(Color.RED, context,"Invalid time format: " + formats[c]);
                 dateFormatList[c] = dateFormatList[0];
@@ -109,7 +109,7 @@ public class TimeManager {
         Matcher matcher = extractor.matcher(cs);
         while(matcher.find()) {
             String number = matcher.group(1);
-            if(number == null || number.length() == 0) number = "0";
+            if(number == null || number.isEmpty()) number = "0";
 
             Map.Entry<Integer, SimpleDateFormat> entry = get(Integer.parseInt(number));
             if(entry == null) continue;
@@ -159,7 +159,7 @@ public class TimeManager {
         Matcher matcher = extractor.matcher(s);
         if(matcher.find()) {
             String number = matcher.group(1);
-            if(number == null || number.length() == 0) number = "0";
+            if(number == null || number.isEmpty()) number = "0";
 
             Map.Entry<Integer, SimpleDateFormat> entry = get(Integer.parseInt(number));
             if(entry == null) {
@@ -171,7 +171,7 @@ public class TimeManager {
     }
 
     private CharSequence span(Context context, Map.Entry<Integer, SimpleDateFormat> entry, int color, Date date, int size) {
-        if(entry == null) return Tuils.EMPTYSTRING;
+        if(entry == null) return Tuils.EMPTY_STRING;
 
         String tf = entry.getValue().format(date);
         int clr = color != TerminalManager.NO_COLOR ? color : entry.getKey();

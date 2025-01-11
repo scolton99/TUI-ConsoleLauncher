@@ -3,7 +3,8 @@ package ohi.andre.consolelauncher.commands.main.raw;
 import android.content.Intent;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.tuils.Tuils;
 
@@ -11,7 +12,7 @@ import ohi.andre.consolelauncher.tuils.Tuils;
  * Created by francescoandreuzzi on 10/07/2017.
  */
 
-public class tutorial implements CommandAbstraction {
+public class tutorial extends AbstractCommand {
 
     final String url = "https://github.com/Andre1299/TUI-ConsoleLauncher/wiki";
 

@@ -4,9 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.text.InputType;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -28,7 +27,7 @@ import java.io.File;
 import java.io.FileReader;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.Command;
+import ohi.andre.consolelauncher.commands.CommandInvocation;
 import ohi.andre.consolelauncher.commands.CommandGroup;
 import ohi.andre.consolelauncher.commands.CommandTuils;
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
@@ -49,9 +48,9 @@ public class TuixtActivity extends Activity {
 
     private long lastEnter;
 
-    public static String PATH = "path";
+    public static final String PATH = "path";
 
-    public static String ERROR_KEY = "error";
+    public static final String ERROR_KEY = "error";
 
     private EditText inputView;
     private EditText fileView;
@@ -76,7 +75,7 @@ public class TuixtActivity extends Activity {
 
         final File file = new File(path);
 
-        CommandGroup group = new CommandGroup(this, "ohi.andre.consolelauncher.commands.tuixt.raw");
+        CommandGroup group = CommandGroup.TUIXT;
 
         try {
             XMLPrefsManager.loadCommons(this);
@@ -84,7 +83,7 @@ public class TuixtActivity extends Activity {
             finish();
         }
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && !XMLPrefsManager.getBoolean(Ui.ignore_bar_color)) {
+        if(!XMLPrefsManager.getBoolean(Ui.ignore_bar_color)) {
             Window window = getWindow();
 
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -142,7 +141,7 @@ public class TuixtActivity extends Activity {
         fileView.setOnTouchListener((v, event) -> {
             if(event.getAction() == MotionEvent.ACTION_DOWN) {
                 outputView.setVisibility(View.GONE);
-                outputView.setText(Tuils.EMPTYSTRING);
+                outputView.setText(Tuils.EMPTY_STRING);
             }
 
             return false;
@@ -212,7 +211,7 @@ public class TuixtActivity extends Activity {
                         try {
                             fileView.setText(builder.toString());
                         } catch (OutOfMemoryError e) {
-                            fileView.setText(Tuils.EMPTYSTRING);
+                            fileView.setText(Tuils.EMPTY_STRING);
                             Toast.makeText(TuixtActivity.this, R.string.tuixt_error, Toast.LENGTH_LONG).show();
                         }
                     });
@@ -225,7 +224,7 @@ public class TuixtActivity extends Activity {
                     runOnUiThread(() -> {
                         System.gc();
 
-                        fileView.setText(Tuils.EMPTYSTRING);
+                        fileView.setText(Tuils.EMPTY_STRING);
                         Toast.makeText(TuixtActivity.this, R.string.tuixt_error, Toast.LENGTH_LONG).show();
                     });
                 }
@@ -259,22 +258,22 @@ public class TuixtActivity extends Activity {
     private void onNewInput() {
         try {
             String input = inputView.getText().toString();
-            inputView.setText(Tuils.EMPTYSTRING);
+            inputView.setText(Tuils.EMPTY_STRING);
 
             input = input.trim();
-            if(input.length() == 0) {
+            if(input.isEmpty()) {
                 return;
             }
 
             outputView.setVisibility(View.VISIBLE);
 
-            Command command = CommandTuils.parse(input, pack);
-            if(command == null) {
-                outputView.setText(R.string.output_commandnotfound);
+            CommandInvocation commandInvocation = CommandInvocation.parse(input, pack);
+            if(commandInvocation == null) {
+                outputView.setText(R.string.output_command_not_found);
                 return;
             }
 
-            String output = command.exec(pack);
+            String output = commandInvocation.exec(pack);
             if(output != null) {
                 outputView.setText(output);
             }

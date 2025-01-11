@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.Uri;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -56,32 +56,36 @@ import static ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.resetFile;
 
 public class HTMLExtractManager {
 
-    public static String ACTION_ADD = BuildConfig.APPLICATION_ID + ".htmlextract_add";
-    public static String ACTION_RM = BuildConfig.APPLICATION_ID + ".htmlextract_rm";
-    public static String ACTION_EDIT = BuildConfig.APPLICATION_ID + ".htmlextract_edit";
-    public static String ACTION_LS = BuildConfig.APPLICATION_ID + ".htmlextract_ls";
+    public static final String ACTION_ADD = BuildConfig.APPLICATION_ID + ".htmlextract_add";
+    public static final String ACTION_RM = BuildConfig.APPLICATION_ID + ".htmlextract_rm";
+    public static final String ACTION_EDIT = BuildConfig.APPLICATION_ID + ".htmlextract_edit";
+    public static final String ACTION_LS = BuildConfig.APPLICATION_ID + ".htmlextract_ls";
 
-    public static String ACTION_QUERY = BuildConfig.APPLICATION_ID + ".htmlextract_query";
-    public static String ACTION_WEATHER = BuildConfig.APPLICATION_ID + ".htmlextract_weather";
+    public static final String ACTION_QUERY = BuildConfig.APPLICATION_ID + ".htmlextract_query";
+    public static final String ACTION_WEATHER = BuildConfig.APPLICATION_ID + ".htmlextract_weather";
 
-    public static String ID = "id";
-    public static String FORMAT_ID = "formatId";
-    public static String TAG_NAME = "tag";
-    public static String WEATHER_AREA = "wArea";
+    public static final String ID = "id";
+    public static final String FORMAT_ID = "formatId";
+    public static final String TAG_NAME = "tag";
+    public static final String WEATHER_AREA = "wArea";
 
-    public static String BROADCAST_COUNT = "broadcastCount";
+    public static final String BROADCAST_COUNT = "broadcastCount";
 
-    public static String PATH = "htmlextract.xml", NAME = "HTMLEXTRACT";
+    public static final String PATH = "htmlextract.xml";
+    public static final String NAME = "HTMLEXTRACT";
 
-    private List<StoreableValue> xpaths, jsons, formats;
+    private final List<StoreableValue> xpaths;
+    private final List<StoreableValue> jsons;
+    private final List<StoreableValue> formats;
 
-    private OkHttpClient client;
-    private BroadcastReceiver receiver;
+    private final OkHttpClient client;
+    private final BroadcastReceiver receiver;
 
     public static int broadcastCount;
 
-    String defaultFormat, weatherFormat;
-    int weatherColor;
+    final String defaultFormat;
+    String weatherFormat;
+    final int weatherColor;
 
     public HTMLExtractManager(Context context, OkHttpClient client) {
         receiver = new BroadcastReceiver() {
@@ -159,11 +163,11 @@ public class HTMLExtractManager {
                         }
                     }
 
-                    if(!check) Tuils.sendOutput(context, R.string.id_notfound);
+                    if(!check) Tuils.sendOutput(context, R.string.id_not_found);
                 } else if(action.equals(ACTION_EDIT)) {
                     int id = intent.getIntExtra(ID, Integer.MAX_VALUE);
                     String newExpression = intent.getStringExtra(XMLPrefsManager.VALUE_ATTRIBUTE);
-                    if(newExpression == null || newExpression.length() == 0) return;
+                    if(newExpression == null || newExpression.isEmpty()) return;
 
                     for(int c = 0; c < xpaths.size(); c++) {
                         if(xpaths.get(c).id == id) {
@@ -186,7 +190,7 @@ public class HTMLExtractManager {
                         }
                     }
 
-                    Tuils.sendOutput(context, R.string.id_notfound);
+                    Tuils.sendOutput(context, R.string.id_not_found);
                 } else if(action.equals(ACTION_LS)) {
                     String tag = intent.getStringExtra(TAG_NAME);
 
@@ -201,7 +205,7 @@ public class HTMLExtractManager {
                         }
                     } catch (Exception e) {
                         builder.append("XPaths:").append(Tuils.NEWLINE);
-                        if(xpaths.size() == 0) builder.append("[]").append(Tuils.NEWLINE);
+                        if(xpaths.isEmpty()) builder.append("[]").append(Tuils.NEWLINE);
                         else {
                             for(StoreableValue v : xpaths) {
                                 builder.append(Tuils.DOUBLE_SPACE).append("- ID: ").append(v.id).append(" -> ").append(v.value).append(Tuils.NEWLINE);
@@ -209,7 +213,7 @@ public class HTMLExtractManager {
                         }
 
                         builder.append("JsonPaths:").append(Tuils.NEWLINE);
-                        if(jsons.size() == 0) builder.append("[]").append(Tuils.NEWLINE);
+                        if(jsons.isEmpty()) builder.append("[]").append(Tuils.NEWLINE);
                         else {
                             for(StoreableValue v : jsons) {
                                 builder.append(Tuils.DOUBLE_SPACE).append("- ID: ").append(v.id).append(" -> ").append(v.value).append(Tuils.NEWLINE);
@@ -217,7 +221,7 @@ public class HTMLExtractManager {
                         }
 
                         builder.append("Formats:").append(Tuils.NEWLINE);
-                        if(formats.size() == 0) builder.append("[]").append(Tuils.NEWLINE);
+                        if(formats.isEmpty()) builder.append("[]").append(Tuils.NEWLINE);
                         else {
                             for(StoreableValue v : formats) {
                                 builder.append(Tuils.DOUBLE_SPACE).append("- ID: ").append(v.id).append(" -> ").append(v.value).append(Tuils.NEWLINE);
@@ -226,7 +230,7 @@ public class HTMLExtractManager {
                     }
 
                     String text = builder.toString().trim();
-                    if(text.length() == 0) text = "[]";
+                    if(text.isEmpty()) text = "[]";
                     Tuils.sendOutput(context, text);
                 } else if(action.equals(ACTION_QUERY)) {
                     String website = intent.getStringExtra(XMLPrefsManager.VALUE_ATTRIBUTE);
@@ -250,7 +254,7 @@ public class HTMLExtractManager {
                             }
 
                             if(format == null) {
-                                Tuils.sendOutput(context, context.getString(R.string.id_notfound) + ": " + formatId + "(" + StoreableValue.Type.format.name() + ")");
+                                Tuils.sendOutput(context, context.getString(R.string.id_not_found) + ": " + formatId + "(" + StoreableValue.Type.format.name() + ")");
                             }
                         }
                     }
@@ -276,7 +280,7 @@ public class HTMLExtractManager {
                         }
 
                         if(path == null) {
-                            Tuils.sendOutput(context, context.getString(R.string.id_notfound) + ": " + pathId);
+                            Tuils.sendOutput(context, context.getString(R.string.id_not_found) + ": " + pathId);
                             return;
                         }
                     }
@@ -360,7 +364,7 @@ public class HTMLExtractManager {
         LocalBroadcastManager.getInstance(context).unregisterReceiver(receiver);
     }
 
-    Pattern weatherFormatPattern = Pattern.compile("%([a-z_]+)(\\d)*(?:\\$\\(([\\.\\+\\-\\*\\/\\^\\d]+)\\))?");
+    final Pattern weatherFormatPattern = Pattern.compile("%([a-z_]+)(\\d)*(?:\\$\\(([\\.\\+\\-\\*\\/\\^\\d]+)\\))?");
 
     private void query(final Context context, final String path, final StoreableValue.Type pathType, final String format, final String url, final boolean weatherArea) {
         new Thread() {
@@ -403,7 +407,7 @@ public class HTMLExtractManager {
 
                     InputStream inputStream = response.body().byteStream();
 
-                    CharSequence output = Tuils.span(Tuils.EMPTYSTRING, outputColor);
+                    CharSequence output = Tuils.span(Tuils.EMPTY_STRING, outputColor);
 
                     if(weatherArea) {
                         String json = Tuils.inputStreamToString(inputStream);
@@ -415,7 +419,7 @@ public class HTMLExtractManager {
                         while(m.find()) {
                             String name = m.group(1);
                             String delay = m.group(2);
-                            if(delay == null || delay.length() == 0) delay = "1";
+                            if(delay == null || delay.isEmpty()) delay = "1";
                             String converter = m.group(3);
 
                             int stopAt = Integer.parseInt(delay);
@@ -426,9 +430,9 @@ public class HTMLExtractManager {
                             while(m1.find()) {
                                 if(c == stopAt) {
                                     String value = m1.group(1);
-                                    if(value == null || value.length() == 0) value = m1.group(2);
+                                    if(value == null || value.isEmpty()) value = m1.group(2);
 
-                                    if(converter != null && converter.length() > 0) {
+                                    if(converter != null && !converter.isEmpty()) {
                                         try {
                                             double d = Double.parseDouble(value);
                                             d = Tuils.textCalculus(d, converter);
@@ -476,7 +480,7 @@ public class HTMLExtractManager {
                             copy = replaceLinkColorReplace(context, copy, url);
                             copy = removeDelimiter(copy);
 
-                            if(copy.toString().trim().length() > 0) output = TextUtils.concat(output, (c != 0 ? Tuils.NEWLINE + Tuils.NEWLINE : Tuils.EMPTYSTRING), copy);
+                            if(!copy.toString().trim().isEmpty()) output = TextUtils.concat(output, (c != 0 ? Tuils.NEWLINE + Tuils.NEWLINE : Tuils.EMPTY_STRING), copy);
                         }
 
                         output(output, context, weatherArea, TerminalManager.CATEGORY_NO_COLOR);
@@ -514,7 +518,7 @@ public class HTMLExtractManager {
                                 copy = replaceLinkColorReplace(context, copy, url);
                                 copy = removeDelimiter(copy);
 
-                                if(copy.toString().trim().length() > 0) output = TextUtils.concat(output, (c != 0 ? Tuils.NEWLINE + Tuils.NEWLINE : Tuils.EMPTYSTRING), copy);
+                                if(!copy.toString().trim().isEmpty()) output = TextUtils.concat(output, (c != 0 ? Tuils.NEWLINE + Tuils.NEWLINE : Tuils.EMPTY_STRING), copy);
                             }
 
                             output(output, context, weatherArea, TerminalManager.CATEGORY_NO_COLOR);
@@ -561,12 +565,12 @@ public class HTMLExtractManager {
         output(context.getString(string), context, weatherArea, category);
     }
 
-    static Pattern tagName = Pattern.compile("%t(?:\\(([^)]*)\\))?", Pattern.CASE_INSENSITIVE);
-    static String nodeValuePattern = "%v";
+    static final Pattern tagName = Pattern.compile("%t(?:\\(([^)]*)\\))?", Pattern.CASE_INSENSITIVE);
+    static final String nodeValuePattern = "%v";
 
-    static Pattern allAttributes = Pattern.compile("%a\\(([^\\)]*)\\)\\(([^\\)]*)\\)", Pattern.CASE_INSENSITIVE);
-    static Pattern attributeName = Pattern.compile("%an", Pattern.CASE_INSENSITIVE);
-    static Pattern attributeValue = Pattern.compile("%av", Pattern.CASE_INSENSITIVE);
+    static final Pattern allAttributes = Pattern.compile("%a\\(([^\\)]*)\\)\\(([^\\)]*)\\)", Pattern.CASE_INSENSITIVE);
+    static final Pattern attributeName = Pattern.compile("%an", Pattern.CASE_INSENSITIVE);
+    static final Pattern attributeValue = Pattern.compile("%av", Pattern.CASE_INSENSITIVE);
 
     static int linkColor, outputColor;
 
@@ -616,11 +620,11 @@ public class HTMLExtractManager {
             if(tag == null) tag = "null";
 
             String replace = "null";
-            if(attribute == null || attribute.length() == 0) {
+            if(attribute == null || attribute.isEmpty()) {
                 replace = tag;
             } else if(attributes != null) {
                 replace = attributes.get(attribute).toString();
-                if(replace == null || replace.length() == 0) replace = "null";
+                if(replace == null || replace.isEmpty()) replace = "null";
             }
 
             return TextUtils.replace(original, new String[] {tagMatcher.group()}, new CharSequence[] {delimiterStart + replace + delimiterEnd});
@@ -665,11 +669,11 @@ public class HTMLExtractManager {
             if(tag == null) tag = "null";
 
             String replace = "null";
-            if(attribute == null || attribute.length() == 0) {
+            if(attribute == null || attribute.isEmpty()) {
                 replace = tag;
             } else if(attributes != null) {
                 replace = attributes.get(attribute);
-                if(replace == null || replace.length() == 0) replace = "null";
+                if(replace == null || replace.isEmpty()) replace = "null";
             }
 
             return TextUtils.replace(original, new String[] {tagMatcher.group()}, new CharSequence[] {delimiterStart + replace + delimiterEnd});
@@ -687,7 +691,7 @@ public class HTMLExtractManager {
         int before;
         do {
             before = original.length();
-            original = TextUtils.replace(original, new String[] {Tuils.patternNewline.pattern()}, new CharSequence[] {Tuils.NEWLINE});;
+            original = TextUtils.replace(original, new String[] {Tuils.patternNewline.pattern()}, new CharSequence[] {Tuils.NEWLINE});
         } while (original.length() < before);
 
         return original;
@@ -700,15 +704,18 @@ public class HTMLExtractManager {
     }
 
 //    static Pattern linkColorReplace = Pattern.compile("#([a-zA-Z0-9]{6})?(?:\\[([^\\]]*)\\](@#&.*@#&)|\\[([^\\]]+)\\])", Pattern.CASE_INSENSITIVE);
-    static Pattern colorPattern = Pattern.compile("(#[a-fA-F0-9]{6})\\[([^\\]]+)\\]");
-    static Pattern linkPattern = Pattern.compile("#\\[((?:(?:http(?:s)?)|(?:www\\.))[^\\]]+)\\]");
-    static Pattern replacePattern = Pattern.compile("#(\\[.+?\\])@#&(.+?)&#@");
+    static final Pattern colorPattern = Pattern.compile("(#[a-fA-F0-9]{6})\\[([^\\]]+)\\]");
+    static final Pattern linkPattern = Pattern.compile("#\\[((?:(?:http(?:s)?)|(?:www\\.))[^\\]]+)\\]");
+    static final Pattern replacePattern = Pattern.compile("#(\\[.+?\\])@#&(.+?)&#@");
 
-    static Pattern extractUrl = Pattern.compile("(.*\\.[^\\/]{2,})\\/", Pattern.CASE_INSENSITIVE);
+    static final Pattern extractUrl = Pattern.compile("(.*\\.[^\\/]{2,})\\/", Pattern.CASE_INSENSITIVE);
 
 //    this is used to know where a group begins and when it ends
-    static String delimiterStart = "@#&", delimiterEnd = new StringBuilder(delimiterStart).reverse().toString(), optionalValueSeparator;
-    static String[] delimiterArray = {delimiterStart, delimiterEnd}, delimiterReplacementArray = {Tuils.EMPTYSTRING, Tuils.EMPTYSTRING};
+    static final String delimiterStart = "@#&";
+    static final String delimiterEnd = new StringBuilder(delimiterStart).reverse().toString();
+    static String optionalValueSeparator;
+    static final String[] delimiterArray = {delimiterStart, delimiterEnd};
+    static final String[] delimiterReplacementArray = {Tuils.EMPTY_STRING, Tuils.EMPTY_STRING};
 
     public static CharSequence replaceLinkColorReplace(Context context, CharSequence original, String url) {
         Matcher m = colorPattern.matcher(original);
@@ -717,7 +724,7 @@ public class HTMLExtractManager {
                 int cl = Color.parseColor(m.group(1));
                 original = TextUtils.replace(original, new String[] {m.group()}, new CharSequence[] {Tuils.span(m.group(2), cl)});
             } catch (Exception e) {
-                Tuils.sendOutput(context, context.getString(R.string.output_invalidcolor) + ": " + m.group(1));
+                Tuils.sendOutput(context, context.getString(R.string.output_invalid_color) + ": " + m.group(1));
             }
         }
 
@@ -747,7 +754,7 @@ public class HTMLExtractManager {
 
             String[] groups = replaceGroups.split("]");
             for(int c = 0; c < groups.length; c++) {
-                groups[c] = groups[c].replaceAll("[\\[\\]]", Tuils.EMPTYSTRING);
+                groups[c] = groups[c].replaceAll("[\\[\\]]", Tuils.EMPTY_STRING);
 
                 String[] split = groups[c].split(optionalValueSeparator);
                 if(split.length == 0) continue;
@@ -766,13 +773,13 @@ public class HTMLExtractManager {
         public enum Type {
             xpath,
             json,
-            format;
+            format
         }
 
-        int id;
+        final int id;
         String value;
 
-        Type type;
+        final Type type;
 
         public StoreableValue(int id, String value, Type type) {
             this.id = id;
@@ -814,7 +821,7 @@ public class HTMLExtractManager {
 
             String output = XMLPrefsManager.add(file, tag, new String[] {ID, XMLPrefsManager.VALUE_ATTRIBUTE}, new String[] {String.valueOf(id), path});
             if(output != null) {
-                if(output.length() > 0) Tuils.sendOutput(Color.RED, context, output);
+                if(!output.isEmpty()) Tuils.sendOutput(Color.RED, context, output);
                 else Tuils.sendOutput(Color.RED, context, R.string.output_error);
                 return null;
             }
@@ -830,9 +837,9 @@ public class HTMLExtractManager {
 
             String output = XMLPrefsManager.removeNode(file, type.name(), new String[] {ID}, new String[] {String.valueOf(id)});
             if(output != null) {
-                if(output.length() > 0) Tuils.sendOutput(Color.RED, context, output);
+                if(!output.isEmpty()) Tuils.sendOutput(Color.RED, context, output);
                 else {
-                    Tuils.sendOutput(Color.RED, context, R.string.id_notfound);
+                    Tuils.sendOutput(Color.RED, context, R.string.id_not_found);
                 }
             }
         }
@@ -845,9 +852,9 @@ public class HTMLExtractManager {
 
             String output = XMLPrefsManager.set(file, type.name(), new String[] {ID}, new String[] {String.valueOf(id)}, new String[] {XMLPrefsManager.VALUE_ATTRIBUTE}, new String[] {newExpression}, false);
             if(output != null) {
-                if(output.length() > 0) Tuils.sendOutput(Color.RED, context, output);
+                if(!output.isEmpty()) Tuils.sendOutput(Color.RED, context, output);
                 else {
-                    Tuils.sendOutput(Color.RED, context, R.string.id_notfound);
+                    Tuils.sendOutput(Color.RED, context, R.string.id_not_found);
                 }
             } else {
                 this.value = newExpression;

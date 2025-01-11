@@ -15,8 +15,8 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.core.app.ActivityCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,17 +35,17 @@ public class TuiLocationManager {
 
     private static final int MAX_DELAY = 10000;
 
-    Context context;
-    BroadcastReceiver receiver;
+    final Context context;
+    final BroadcastReceiver receiver;
 
-    LocationListener locationListener;
+    final LocationListener locationListener;
 
     Handler handler;
 
     public boolean locationAvailable = false;
     public double latitude, longitude;
 
-    private List<String> actionsPool;
+    private final List<String> actionsPool;
 
     private static TuiLocationManager instance;
     public static TuiLocationManager instance(Context context) {

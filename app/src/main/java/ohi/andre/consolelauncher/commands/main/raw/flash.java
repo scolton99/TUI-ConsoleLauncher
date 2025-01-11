@@ -3,23 +3,24 @@ package ohi.andre.consolelauncher.commands.main.raw;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import ohi.andre.consolelauncher.LauncherActivity;
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.managers.flashlight.TorchManager;
 
-public class flash implements CommandAbstraction {
+public class flash extends AbstractCommand {
 
     @Override
     public String exec(ExecutePack pack) {
         if (ContextCompat.checkSelfPermission(pack.context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
 
             ActivityCompat.requestPermissions((Activity) pack.context, new String[]{Manifest.permission.CAMERA}, LauncherActivity.COMMAND_REQUEST_PERMISSION);
-            return pack.context.getString(R.string.output_waitingpermission);
+            return pack.context.getString(R.string.output_waiting_permissions);
         }
 
         TorchManager.getInstance().toggle(pack.context);

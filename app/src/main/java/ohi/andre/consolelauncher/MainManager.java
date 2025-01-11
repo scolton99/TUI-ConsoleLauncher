@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Parcelable;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -16,12 +16,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import ohi.andre.consolelauncher.commands.Command;
+import ohi.andre.consolelauncher.commands.CommandInvocation;
 import ohi.andre.consolelauncher.commands.CommandGroup;
 import ohi.andre.consolelauncher.commands.CommandTuils;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.commands.main.raw.location;
-import ohi.andre.consolelauncher.commands.main.specific.RedirectCommand;
 import ohi.andre.consolelauncher.managers.AliasManager;
 import ohi.andre.consolelauncher.managers.AppsManager;
 import ohi.andre.consolelauncher.managers.ChangelogManager;
@@ -43,9 +42,7 @@ import ohi.andre.consolelauncher.tuils.PrivateIOReceiver;
 import ohi.andre.consolelauncher.tuils.StoppableThread;
 import ohi.andre.consolelauncher.tuils.Tuils;
 import ohi.andre.consolelauncher.tuils.interfaces.CommandExecuter;
-import ohi.andre.consolelauncher.tuils.interfaces.OnRedirectionListener;
-import ohi.andre.consolelauncher.tuils.interfaces.Redirectator;
-import ohi.andre.consolelauncher.tuils.libsuperuser.Shell;
+import eu.chainfire.libsuperuser.Shell;
 import ohi.andre.consolelauncher.tuils.libsuperuser.ShellHolder;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
@@ -66,75 +63,50 @@ limitations under the License.*/
 
 public class MainManager {
 
-    public static String ACTION_EXEC = BuildConfig.APPLICATION_ID + ".main_exec";
-    public static String CMD = "cmd", NEED_WRITE_INPUT = "writeInput", ALIAS_NAME = "aliasName", PARCELABLE = "parcelable", CMD_COUNT = "cmdCount", MUSIC_SERVICE = "musicService";
-
-    private RedirectCommand redirect;
-    private Redirectator redirectator = new Redirectator() {
-        @Override
-        public void prepareRedirection(RedirectCommand cmd) {
-            redirect = cmd;
-
-            if(redirectionListener != null) {
-                redirectionListener.onRedirectionRequest(cmd);
-            }
-        }
-
-        @Override
-        public void cleanup() {
-            if(redirect != null) {
-                redirect.beforeObjects.clear();
-                redirect.afterObjects.clear();
-
-                if(redirectionListener != null) {
-                    redirectionListener.onRedirectionEnd(redirect);
-                }
-
-                redirect = null;
-            }
-        }
-    };
-    private OnRedirectionListener redirectionListener;
-    public void setRedirectionListener(OnRedirectionListener redirectionListener) {
-        this.redirectionListener = redirectionListener;
-    }
+    public static final String ACTION_EXEC = BuildConfig.APPLICATION_ID + ".main_exec";
+    public static final String CMD = "cmd";
+    public static final String NEED_WRITE_INPUT = "writeInput";
+    public static final String ALIAS_NAME = "aliasName";
+    public static final String PARCELABLE = "parcelable";
+    public static final String CMD_COUNT = "cmdCount";
+    public static final String MUSIC_SERVICE = "musicService";
 
     private final String COMMANDS_PKG = "ohi.andre.consolelauncher.commands.main.raw";
 
-    private CmdTrigger[] triggers = new CmdTrigger[] {
+    private final CmdTrigger[] triggers = new CmdTrigger[] {
             new GroupTrigger(),
             new AliasTrigger(),
             new TuiCommandTrigger(),
             new AppTrigger(),
             new ShellCommandTrigger()
     };
-    private MainPack mainPack;
+    private final MainPack mainPack;
 
-    private LauncherActivity mContext;
+    private final LauncherActivity mContext;
 
-    private boolean showAliasValue;
-    private boolean showAppHistory;
-    private int aliasContentColor;
+    private final boolean showAliasValue;
+    private final boolean showAppHistory;
+    private final int aliasContentColor;
 
-    private String multipleCmdSeparator;
+    private final String multipleCmdSeparator;
 
     public static Shell.Interactive interactive;
 
-    private AliasManager aliasManager;
-    private RssManager rssManager;
-    private AppsManager appsManager;
+    private final AliasManager aliasManager;
+    private final RssManager rssManager;
+    private final AppsManager appsManager;
     private ContactManager contactManager;
-    private MusicManager2 musicManager2;
-    private ThemeManager themeManager;
-    private HTMLExtractManager htmlExtractManager;
+    private final MusicManager2 musicManager2;
+    private final ThemeManager themeManager;
+    private final HTMLExtractManager htmlExtractManager;
 
     MessagesManager messagesManager;
 
-    private BroadcastReceiver receiver;
+    private final BroadcastReceiver receiver;
 
     public static int commandCount = 0;
 
-    private boolean keeperServiceRunning;
+    private final boolean keeperServiceRunning;
 
     protected MainManager(LauncherActivity c) {
         mContext = c;
@@ -147,7 +119,7 @@ public class MainManager {
 
         multipleCmdSeparator = XMLPrefsManager.get(Behavior.multiple_cmd_separator);
 
-        CommandGroup group = new CommandGroup(mContext, COMMANDS_PKG);
+        CommandGroup group = CommandGroup.MAIN;
 
         try {
             contactManager = new ContactManager(mContext);
@@ -206,7 +178,7 @@ public class MainManager {
             messagesManager = new MessagesManager(mContext);
         }
 
-        mainPack = new MainPack(mContext, group, aliasManager, appsManager, musicManager2, contactManager, redirectator, rssManager, client);
+        mainPack = new MainPack(mContext, group, aliasManager, appsManager, musicManager2, contactManager, rssManager, client);
 
         ShellHolder shellHolder = new ShellHolder(mContext);
         interactive = shellHolder.build();
@@ -287,7 +259,7 @@ public class MainManager {
         }
     }
 
-    Pattern colorExtractor = Pattern.compile("(#[^(]{6})\\[([^\\)]*)\\]", Pattern.CASE_INSENSITIVE);
+    final Pattern colorExtractor = Pattern.compile("(#[^(]{6})\\[([^\\)]*)\\]", Pattern.CASE_INSENSITIVE);
 
 //    command manager
     public void onCommand(String input, String alias, boolean wasMusicService) {
@@ -295,22 +267,12 @@ public class MainManager {
 
         if(alias == null) updateServices(input, wasMusicService);
 
-        if(redirect != null) {
-            if(!redirect.isWaitingPermission()) {
-                redirect.afterObjects.add(input);
-            }
-            String output = redirect.onRedirect(mainPack);
-            Tuils.sendOutput(mContext, output);
-
-            return;
-        }
-
         if(alias != null && showAliasValue) {
            Tuils.sendOutput(aliasContentColor, mContext, aliasManager.formatLabel(alias, input));
         }
 
         String[] cmds;
-        if(multipleCmdSeparator.length() > 0) {
+        if(!multipleCmdSeparator.isEmpty()) {
             cmds = input.split(multipleCmdSeparator);
         } else {
             cmds = new String[] {input};
@@ -350,11 +312,7 @@ public class MainManager {
     }
 
     public void onLongBack() {
-        Tuils.sendInput(mContext, Tuils.EMPTYSTRING);
-    }
-
-    public void sendPermissionNotGrantedWarning() {
-        redirectator.cleanup();
+        Tuils.sendInput(mContext, Tuils.EMPTY_STRING);
     }
 
     public void dispose() {
@@ -404,9 +362,9 @@ public class MainManager {
     String appFormat;
     int outputColor;
 
-    Pattern pa = Pattern.compile("%a", Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
-    Pattern pp = Pattern.compile("%p", Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
-    Pattern pl = Pattern.compile("%l", Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
+    final Pattern pa = Pattern.compile("%a", Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
+    final Pattern pp = Pattern.compile("%p", Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
+    final Pattern pl = Pattern.compile("%l", Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
 
     public boolean performLaunch(MainPack mainPack, AppsManager.LaunchInfo i, String input) {
         Intent intent = appsManager.getIntent(i);
@@ -447,7 +405,7 @@ public class MainManager {
 
         @Override
         public boolean trigger(MainPack info, String input) {
-            String alias[] = aliasManager.getAlias(input, true);
+            String[] alias = aliasManager.getAlias(input, true);
 
             String aliasValue = alias[0];
             if (alias[0] == null) {
@@ -551,10 +509,10 @@ public class MainManager {
     private class TuiCommandTrigger implements CmdTrigger {
 
         @Override
-        public boolean trigger(final MainPack info, final String input) throws Exception {
+        public boolean trigger(final MainPack info, final String input) {
 
-            final Command command = CommandTuils.parse(input, info);
-            if(command == null) return false;
+            final CommandInvocation invocation = CommandInvocation.parse(input, info);
+            if(invocation == null) return false;
 
             mainPack.lastCommand = input;
 
@@ -564,7 +522,7 @@ public class MainManager {
                     super.run();
 
                     try {
-                        String output = command.exec(info);
+                        String output = invocation.exec(info);
                         if(output != null) {
                             Tuils.sendOutput(info, output, TerminalManager.CATEGORY_OUTPUT);
                         }
@@ -580,7 +538,7 @@ public class MainManager {
     }
 
     public interface Group {
-        List<? extends Object> members();
+        List<?> members();
         boolean use(MainPack mainPack, String input);
         String name();
     }

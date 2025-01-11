@@ -17,12 +17,12 @@ TASK null id=51
               android.support.v7.widget.ContentFrameLayout{3aa0c12f V.E..... ... 0,0-768,658 #1020002 android:id/content}
                 android.widget.LinearLayout{aa8c33c V.E..... ... 0,0-768,658 #7f0d005f app:id/mainview}
                   android.widget.LinearLayout{31bf98c5 V.E..... ... 0,0-768,170}
-                    android.support.v7.widget.AppCompatTextView{3c7e421a V.ED.... ... 0,0-768,27 #7f0d0059 app:id/tv0}
-                    android.support.v7.widget.AppCompatTextView{3402414b V.ED.... ... 0,27-768,56 #7f0d005a app:id/tv1}
-                    android.support.v7.widget.AppCompatTextView{1fdcd728 V.ED.... ... 0,56-768,83 #7f0d005b app:id/tv2}
-                    android.support.v7.widget.AppCompatTextView{2b85fc41 V.ED.... ... 0,83-768,112 #7f0d005c app:id/tv3}
-                    android.support.v7.widget.AppCompatTextView{362e65e6 V.ED.... ... 0,112-768,141 #7f0d005d app:id/tv4}
-                    android.support.v7.widget.AppCompatTextView{2ab1a727 V.ED.... ... 0,141-768,170 #7f0d005e app:id/tv5}
+                    androidx.appcompat.widget.AppCompatTextView{3c7e421a V.ED.... ... 0,0-768,27 #7f0d0059 app:id/tv0}
+                    androidx.appcompat.widget.AppCompatTextView{3402414b V.ED.... ... 0,27-768,56 #7f0d005a app:id/tv1}
+                    androidx.appcompat.widget.AppCompatTextView{1fdcd728 V.ED.... ... 0,56-768,83 #7f0d005b app:id/tv2}
+                    androidx.appcompat.widget.AppCompatTextView{2b85fc41 V.ED.... ... 0,83-768,112 #7f0d005c app:id/tv3}
+                    androidx.appcompat.widget.AppCompatTextView{362e65e6 V.ED.... ... 0,112-768,141 #7f0d005d app:id/tv4}
+                    androidx.appcompat.widget.AppCompatTextView{2ab1a727 V.ED.... ... 0,141-768,170 #7f0d005e app:id/tv5}
                   android.widget.RelativeLayout{3dbc3dd4 V.E..... ... 0,170-768,658}
                     android.widget.HorizontalScrollView{9f51b7d V.EDH... ... 0,388-768,488 #7f0d0060 app:id/suggestions_container}
                       android.widget.LinearLayout{2b6afa72 V.E..... ... 0,0-228,100 #7f0d0061 app:id/suggestions_group}
@@ -33,12 +33,12 @@ TASK null id=51
                       android.support.v7.widget.AppCompatImageButton{244a541f VFED..C. ... 384,0-576,44 #7f0d0065 app:id/next_view}
                       android.support.v7.widget.AppCompatImageButton{841736c VFED..C. ... 576,0-768,44 #7f0d0066 app:id/paste_view}
                     android.widget.LinearLayout{26913d35 V.E..... ... 0,230-768,344 #7f0d0067 app:id/input_group}
-                      android.support.v7.widget.AppCompatTextView{387b65ca V.ED.... ... 0,18-32,95 #7f0d0068 app:id/prefix_view}
-                      android.support.v7.widget.AppCompatEditText{29ca133b VFED..CL F.. 32,18-676,95 #7f0d0069 app:id/input_view}
+                      androidx.appcompat.widget.AppCompatTextView{387b65ca V.ED.... ... 0,18-32,95 #7f0d0068 app:id/prefix_view}
+                      androidx.appcompat.widget.AppCompatEditText{29ca133b VFED..CL F.. 32,18-676,95 #7f0d0069 app:id/input_view}
                       android.support.v7.widget.AppCompatImageButton{37885a58 VFED..C. ... 676,0-768,114 #7f0d006a app:id/submit_tv}
                     android.widget.ScrollView{28a577b1 VFED.V.. ... 0,0-768,230}
                       android.widget.LinearLayout{3cd21496 V.E..... ... 0,0-768,230}
                         android.view.View{29bca817 V.ED.... ... 0,0-0,73}
-                        android.support.v7.widget.AppCompatTextView{1954c404 VFED.VCL ... 0,73-768,230 #7f0d006b app:id/terminal_view}
+                        androidx.appcompat.widget.AppCompatTextView{1954c404 VFED.VCL ... 0,73-768,230 #7f0d006b app:id/terminal_view}
         android.view.View{3be8dded V.ED.... ... 0,0-768,50 #102002f android:id/statusBarBackground}
         android.view.View{812e422 V.ED.... ... 0,1184-768,1280 #1020030 android:id/navigationBarBackground}

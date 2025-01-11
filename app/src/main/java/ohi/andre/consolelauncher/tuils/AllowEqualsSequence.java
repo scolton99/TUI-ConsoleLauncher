@@ -1,6 +1,6 @@
 package ohi.andre.consolelauncher.tuils;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,14 +12,14 @@ import java.util.List;
 
 public class AllowEqualsSequence {
 
-    List<Entry> sequence;
+    final List<Entry> sequence;
 
-    public AllowEqualsSequence(float[] values, Object[] objs) {
+    public AllowEqualsSequence(float[] values, Object[] objects) {
         this.sequence = new ArrayList<>();
 
         for (int count = 0; count < values.length; count++) {
             if(values[count] == Integer.MAX_VALUE) continue;
-            sequence.add(new Entry(values[count], objs[count]));
+            sequence.add(new Entry(values[count], objects[count]));
         }
         Collections.sort(this.sequence);
 
@@ -39,19 +39,19 @@ public class AllowEqualsSequence {
         List<Object> o = new ArrayList<>();
         for(Entry entry : sequence) {
             if(entry.key == key) o.add(entry.obj);
-            else if(o.size() > 0) break;
+            else if(!o.isEmpty()) break;
         }
 
         return o.toArray(new Object[o.size()]);
     }
 
     public int getMaxKey() {
-        if(sequence.size() == 0) return -1;
+        if(sequence.isEmpty()) return -1;
         return sequence.get(sequence.size() - 1).key;
     }
 
     public int getMinKey() {
-        if(sequence.size() == 0) return -1;
+        if(sequence.isEmpty()) return -1;
         return sequence.get(0).key;
     }
 
@@ -61,8 +61,8 @@ public class AllowEqualsSequence {
 
     private class Entry implements Comparable<Entry> {
 
-        float value;
-        Object obj;
+        final float value;
+        final Object obj;
 
         int key;
 

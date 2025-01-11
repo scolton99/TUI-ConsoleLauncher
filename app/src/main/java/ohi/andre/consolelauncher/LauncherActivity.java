@@ -10,11 +10,22 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsAnimationCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Looper;
+import android.provider.Settings;
+import android.text.Layout;
 import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
@@ -23,10 +34,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import java.util.AbstractMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
@@ -50,9 +66,9 @@ import ohi.andre.consolelauncher.managers.xml.options.Ui;
 import ohi.andre.consolelauncher.tuils.Assist;
 import ohi.andre.consolelauncher.tuils.CustomExceptionHandler;
 import ohi.andre.consolelauncher.tuils.LongClickableSpan;
+import ohi.andre.consolelauncher.tuils.OutlineTextView;
 import ohi.andre.consolelauncher.tuils.PrivateIOReceiver;
 import ohi.andre.consolelauncher.tuils.PublicIOReceiver;
-import ohi.andre.consolelauncher.tuils.SimpleMutableEntry;
 import ohi.andre.consolelauncher.tuils.Tuils;
 import ohi.andre.consolelauncher.tuils.interfaces.Inputable;
 import ohi.andre.consolelauncher.tuils.interfaces.Outputable;
@@ -76,14 +92,14 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
     private boolean openKeyboardOnStart, canApplyTheme, backButtonEnabled;
 
     private Set<ReloadMessageCategory> categories;
-    private Runnable stopActivity = () -> {
+    private final Runnable stopActivity = () -> {
             dispose();
             finish();
 
             Intent startMain = new Intent(Intent.ACTION_MAIN);
             startMain.addCategory(Intent.CATEGORY_HOME);
 
-            CharSequence reloadMessage = Tuils.EMPTYSTRING;
+            CharSequence reloadMessage = Tuils.EMPTY_STRING;
             for (ReloadMessageCategory c : categories) {
                 reloadMessage = TextUtils.concat(reloadMessage, Tuils.NEWLINE, c.text());
             }
@@ -92,7 +108,7 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
             startActivity(startMain);
     };
 
-    private Inputable in = new Inputable() {
+    private final Inputable in = new Inputable() {
 
         @Override
         public void in(String s) {
@@ -110,15 +126,15 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
         }
     };
 
-    private Outputable out = new Outputable() {
+    private final Outputable out = new Outputable() {
 
         private final int DELAY = 500;
 
-        Queue<SimpleMutableEntry<CharSequence,Integer>> textColor = new LinkedList<>();
-        Queue<SimpleMutableEntry<CharSequence,Integer>> textCategory = new LinkedList<>();
+        Queue<AbstractMap.SimpleEntry<CharSequence,Integer>> textColor = new LinkedList<>();
+        Queue<AbstractMap.SimpleEntry<CharSequence,Integer>> textCategory = new LinkedList<>();
 
         boolean charged = false;
-        Handler handler = new Handler();
+        Handler handler = new Handler(Looper.getMainLooper());
 
         Runnable r = new Runnable() {
             @Override
@@ -128,7 +144,7 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
                     return;
                 }
 
-                SimpleMutableEntry<CharSequence,Integer> sm;
+                AbstractMap.SimpleEntry<CharSequence,Integer> sm;
                 while ((sm = textCategory.poll()) != null) {
                     ui.setOutput(sm.getKey(), sm.getValue());
                 }
@@ -148,7 +164,7 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
         public void onOutput(CharSequence output) {
             if(ui != null) ui.setOutput(output, TerminalManager.CATEGORY_OUTPUT);
             else {
-                textCategory.add(new SimpleMutableEntry<>(output, TerminalManager.CATEGORY_OUTPUT));
+                textCategory.add(new AbstractMap.SimpleEntry<>(output, TerminalManager.CATEGORY_OUTPUT));
 
                 if(!charged) {
                     charged = true;
@@ -161,7 +177,7 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
         public void onOutput(CharSequence output, int category) {
             if(ui != null) ui.setOutput(output, category);
             else {
-                textCategory.add(new SimpleMutableEntry<>(output, category));
+                textCategory.add(new AbstractMap.SimpleEntry<>(output, category));
 
                 if(!charged) {
                     charged = true;
@@ -174,7 +190,7 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
         public void onOutput(int color, CharSequence output) {
             if(ui != null) ui.setOutput(color, output);
             else {
-                textColor.add(new SimpleMutableEntry<>(output, color));
+                textColor.add(new AbstractMap.SimpleEntry<>(output, color));
 
                 if(!charged) {
                     charged = true;
@@ -199,10 +215,10 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
             return;
         }
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED  &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
-
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, LauncherActivity.STARTING_PERMISSION);
+        if (!Environment.isExternalStorageManager()) {
+            Intent intent = new Intent();
+            intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+            startActivity(intent);
         } else {
             canApplyTheme = true;
             finishOnCreate();
@@ -230,18 +246,16 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
         filter1.addAction(PublicIOReceiver.ACTION_OUTPUT);
 
         publicIOReceiver = new PublicIOReceiver();
-        getApplicationContext().registerReceiver(publicIOReceiver, filter1);
+        ContextCompat.registerReceiver(getApplicationContext(), publicIOReceiver, filter1, ContextCompat.RECEIVER_NOT_EXPORTED);
 
         int requestedOrientation = XMLPrefsManager.getInt(Behavior.orientation);
         if(requestedOrientation >= 0 && requestedOrientation != 2) {
             int orientation = getResources().getConfiguration().orientation;
             if(orientation != requestedOrientation) setRequestedOrientation(requestedOrientation);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
-            }
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         }
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && !XMLPrefsManager.getBoolean(Ui.ignore_bar_color)) {
+        if(!XMLPrefsManager.getBoolean(Ui.ignore_bar_color)) {
             Window window = getWindow();
 
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -306,7 +320,7 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
                     startService(notificationIntent);
                 } catch (NoClassDefFoundError er) {
                     Intent intent = new Intent(PrivateIOReceiver.ACTION_OUTPUT);
-                    intent.putExtra(PrivateIOReceiver.TEXT, getString(R.string.output_notification_error) + Tuils.SPACE + er.toString());
+                    intent.putExtra(PrivateIOReceiver.TEXT, getString(R.string.output_notification_error) + Tuils.SPACE + er);
                 }
             } else {
                 Tuils.sendOutput(Color.RED, this, R.string.notification_low_api);
@@ -331,25 +345,41 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
 
         main = new MainManager(this);
 
-        ViewGroup mainView = (ViewGroup) findViewById(R.id.mainview);
+        LinearLayout mainView = findViewById(R.id.mainview);
 
-//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !XMLPrefsManager.getBoolean(Ui.ignore_bar_color) && !XMLPrefsManager.getBoolean(Ui.statusbar_light_icons)) {
-//            mainView.setSystemUiVisibility(0);
-//        }
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !XMLPrefsManager.getBoolean(Ui.ignore_bar_color) && !XMLPrefsManager.getBoolean(Ui.statusbar_light_icons)) {
+        if(!XMLPrefsManager.getBoolean(Ui.ignore_bar_color) && !XMLPrefsManager.getBoolean(Ui.statusbar_light_icons)) {
             mainView.setSystemUiVisibility(mainView.getSystemUiVisibility() | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
 
         ui = new UIManager(this, mainView, main.getMainPack(), canApplyTheme, main.executer());
 
-        main.setRedirectionListener(ui.buildRedirectionListener());
         ui.pack = main.getMainPack();
 
-        in.in(Tuils.EMPTYSTRING);
+        in.in(Tuils.EMPTY_STRING);
         ui.focusTerminal();
 
         if(fullscreen) Assist.assistActivity(this);
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.about_device_view), (v, i) -> {
+            Insets insets = i.getInsets(WindowInsetsCompat.Type.systemBars());
+
+            LinearLayout.LayoutParams mlp = (LinearLayout.LayoutParams) v.getLayoutParams();
+            mlp.topMargin = insets.top;
+            v.setLayoutParams(mlp);
+
+            return i;
+        });
+
+//        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.input_down_layout), (v, i) -> {
+//            Insets ime = i.getInsets(WindowInsetsCompat.Type.ime());
+//            Insets insets = i.getInsets(WindowInsetsCompat.Type.systemBars());
+//
+//            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
+//            params.bottomMargin = Math.max(insets.bottom, ime.bottom);
+//            v.setLayoutParams(params);
+//
+//            return i;
+//        });
 
         System.gc();
     }
@@ -519,7 +549,9 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
         if(permissions.length > 0 && permissions[0].equals(Manifest.permission.READ_CONTACTS) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             LocalBroadcastManager.getInstance(this.getApplicationContext()).sendBroadcast(new Intent(ContactManager.ACTION_REFRESH));
         }
@@ -531,8 +563,7 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
                         MainPack info = main.getMainPack();
                         main.onCommand(info.lastCommand, (String) null, false);
                     } else {
-                        ui.setOutput(getString(R.string.output_nopermissions), TerminalManager.CATEGORY_OUTPUT);
-                        main.sendPermissionNotGrantedWarning();
+                        ui.setOutput(getString(R.string.output_no_permissions), TerminalManager.CATEGORY_OUTPUT);
                     }
                     break;
                 case STARTING_PERMISSION:
@@ -561,7 +592,7 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
                     break;
                 case COMMAND_SUGGESTION_REQUEST_PERMISSION:
                     if (grantResults.length == 0 && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                        ui.setOutput(getString(R.string.output_nopermissions), TerminalManager.CATEGORY_OUTPUT);
+                        ui.setOutput(getString(R.string.output_no_permissions), TerminalManager.CATEGORY_OUTPUT);
                     }
                     break;
                 case LOCATION_REQUEST_PERMISSION:

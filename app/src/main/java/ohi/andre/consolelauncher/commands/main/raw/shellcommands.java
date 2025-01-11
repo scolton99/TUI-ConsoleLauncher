@@ -5,20 +5,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.tuils.Tuils;
 
 /**
  * Created by francescoandreuzzi on 19/04/16.
  */
-public class shellcommands implements CommandAbstraction {
+public class shellcommands extends AbstractCommand {
 
     @Override
     public String exec(ExecutePack pack) {
@@ -31,7 +31,7 @@ public class shellcommands implements CommandAbstraction {
         Tuils.addSeparator(commands, Tuils.SPACE);
         Tuils.insertHeaders(commands, true);
 
-        return Tuils.toPlanString(commands, Tuils.EMPTYSTRING);
+        return Tuils.toPlanString(commands, Tuils.EMPTY_STRING);
     }
 
     private final String[] path = {
@@ -64,7 +64,7 @@ public class shellcommands implements CommandAbstraction {
 
     @Override
     public int helpRes() {
-        return R.string.help_shellcommands;
+        return R.string.help_shell_commands;
     }
 
     @Override

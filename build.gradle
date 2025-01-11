@@ -1,24 +1,24 @@
 buildscript {
-
     repositories {
-        jcenter()
         mavenCentral()
         google()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.1'
+        classpath 'com.android.tools.build:gradle:8.8.0'
     }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+tasks.register('clean', Delete) {
+    delete rootProject.layout.buildDirectory
 }
 
 allprojects {
     repositories {
-        jcenter()
         google()
         mavenCentral()
+        maven {
+            url = 'https://jitpack.io'
+        }
     }
 }

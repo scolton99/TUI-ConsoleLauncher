@@ -1,11 +1,12 @@
 package ohi.andre.consolelauncher.tuils;
 
-/**
+/*
  * Created by francescoandreuzzi on 28/09/2017.
  */
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class NetworkUtils {
@@ -31,7 +32,7 @@ public class NetworkUtils {
      * @return  array of NULL if error was found
      */
     public static byte[] getUTF8Bytes(String str) {
-        try { return str.getBytes("UTF-8"); } catch (Exception ex) { return null; }
+        try { return str.getBytes(StandardCharsets.UTF_8); } catch (Exception ex) { return null; }
     }
 
     /**
@@ -57,7 +58,7 @@ public class NetworkUtils {
                 }
                 count+=read;
             }
-            return isUTF8 ? new String(baos.toByteArray(), "UTF-8") : new String(baos.toByteArray());
+            return isUTF8 ? new String(baos.toByteArray(), StandardCharsets.UTF_8) : new String(baos.toByteArray());
         } finally {
             try{ is.close(); } catch(Exception ex){}
         }
@@ -95,7 +96,7 @@ public class NetworkUtils {
 
     /**
      * Get IP address from first non-localhost interface
-     * @param ipv4  true=return ipv4, false=return ipv6
+     * @param useIPv4  true=return ipv4, false=return ipv6
      * @return  address or empty string
      */
     public static String getIPAddress(boolean useIPv4) {

@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.os.Handler;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import org.w3c.dom.Document;
@@ -36,7 +36,7 @@ import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsList;
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave;
 import ohi.andre.consolelauncher.tuils.StoppableThread;
 import ohi.andre.consolelauncher.tuils.Tuils;
-import ohi.andre.consolelauncher.tuils.html_escape.HtmlEscape;
+import org.unbescape.html.HtmlEscape;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -56,27 +56,28 @@ public class RssManager implements XMLPrefsElement {
 
     private final String RSS_FOLDER = "rss";
 
-    public static String TIME_ATTRIBUTE  = "updateTimeSec";
-    public static String SHOW_ATTRIBUTE = "show";
-    public static String URL_ATTRIBUTE = "url";
-    public static String LASTCHECKED_ATTRIBUTE = "lastChecked";
-    public static String LAST_SHOWN_ITEM_ATTRIBUTE = "lastShownItem";
-    public static String ID_ATTRIBUTE = "id", FORMAT_ATTRIBUTE = "format";
-    public static String INCLUDE_ATTRIBUTE = "includeIfMatches";
-    public static String EXCLUDE_ATTRIBUTE = "excludeIfMatches";
-    public static String COLOR_ATTRIBUTE = "color";
-    public static String WIFIONLY_ATTRIBUTE = "wifiOnly";
-    public static String TIME_FORMAT_ATTRIBUTE = "timeFormat";
-    public static String DATE_TAG_ATTRIBUTE = "pubDateTag";
-    public static String ENTRY_TAG_ATTRIBUTE = "entryTag";
-    public static String ON_ATTRIBUTE = "on";
-    public static String CMD_ATTRIBUTE = "cmd";
+    public static final String TIME_ATTRIBUTE  = "updateTimeSec";
+    public static final String SHOW_ATTRIBUTE = "show";
+    public static final String URL_ATTRIBUTE = "url";
+    public static final String LASTCHECKED_ATTRIBUTE = "lastChecked";
+    public static final String LAST_SHOWN_ITEM_ATTRIBUTE = "lastShownItem";
+    public static final String ID_ATTRIBUTE = "id";
+    public static final String FORMAT_ATTRIBUTE = "format";
+    public static final String INCLUDE_ATTRIBUTE = "includeIfMatches";
+    public static final String EXCLUDE_ATTRIBUTE = "excludeIfMatches";
+    public static final String COLOR_ATTRIBUTE = "color";
+    public static final String WIFIONLY_ATTRIBUTE = "wifiOnly";
+    public static final String TIME_FORMAT_ATTRIBUTE = "timeFormat";
+    public static final String DATE_TAG_ATTRIBUTE = "pubDateTag";
+    public static final String ENTRY_TAG_ATTRIBUTE = "entryTag";
+    public static final String ON_ATTRIBUTE = "on";
+    public static final String CMD_ATTRIBUTE = "cmd";
 
     public static final String RSS_LABEL = "rss", FORMAT_LABEL = "format", REGEX_CMD_LABEL = "regex";
 
     private final String PUBDATE_CHILD = "pubDate", ENTRY_CHILD = "item", LINK_CHILD = "link", HREF_ATTRIBUTE = "href";
 
-    private SimpleDateFormat defaultRSSDateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
+    private final SimpleDateFormat defaultRSSDateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
 
     private static XMLPrefsList values;
 
@@ -110,23 +111,24 @@ public class RssManager implements XMLPrefsElement {
 
     private boolean includeRssDefault, showDownloadMessage, click;
 
-    private Context context;
-    private Handler handler;
+    private final Context context;
+    private final Handler handler;
 
-    private File root, rssIndexFile;
+    private final File root;
+    private final File rssIndexFile;
 
     private List<Rss> feeds;
     private List<XMLPrefsManager.IdValue> formats;
     private List<CmdableRegex> cmdRegexes;
 
-    private OkHttpClient client;
+    private final OkHttpClient client;
 
     //    those will obscure the tag and its content
     private Pattern[] hideTagPatterns;
 
     private Pattern urlPattern, idPattern, bPattern, kbPattern, mbPattern, gbPattern;
 
-    private ConnectivityManager connectivityManager;
+    private final ConnectivityManager connectivityManager;
 
     public RssManager(Context context, OkHttpClient client) {
         instance = this;
@@ -250,13 +252,13 @@ public class RssManager implements XMLPrefsElement {
                                     }
 
                                     String regex = XMLPrefsManager.getStringAttribute(e, XMLPrefsManager.VALUE_ATTRIBUTE);
-                                    if(regex == null || regex.length() == 0) continue;
+                                    if(regex == null || regex.isEmpty()) continue;
 
                                     String on = XMLPrefsManager.getStringAttribute(e, ON_ATTRIBUTE);
-                                    if(on == null || on.length() == 0) continue;
+                                    if(on == null || on.isEmpty()) continue;
 
                                     String cmd = XMLPrefsManager.getStringAttribute(e, CMD_ATTRIBUTE);
-                                    if(cmd == null || cmd.length() == 0) continue;
+                                    if(cmd == null || cmd.isEmpty()) continue;
 
                                     cmdRegexes.add(new CmdableRegex(id, on, regex, cmd));
                                 }
@@ -264,7 +266,7 @@ public class RssManager implements XMLPrefsElement {
                         }
                     }
 
-                    if (enums.size() > 0) {
+                    if (!enums.isEmpty()) {
                         for (XMLPrefsSave s : enums) {
                             String value = s.defaultValue();
 
@@ -306,12 +308,12 @@ public class RssManager implements XMLPrefsElement {
                     downloadMessageColor = XMLPrefsManager.getColor(ohi.andre.consolelauncher.managers.xml.options.Rss.rss_download_message_color);
                 }
 
-                String hiddenTags = XMLPrefsManager.get(ohi.andre.consolelauncher.managers.xml.options.Rss.rss_hidden_tags).replaceAll(Tuils.SPACE, Tuils.EMPTYSTRING);
+                String hiddenTags = XMLPrefsManager.get(ohi.andre.consolelauncher.managers.xml.options.Rss.rss_hidden_tags).replaceAll(Tuils.SPACE, Tuils.EMPTY_STRING);
                 String[] split = null;
                 for(int c = 0; c < hiddenTags.length(); c++) {
                     char ch = hiddenTags.charAt(c);
                     if(Character.isLetter(ch)) continue;
-                    split = hiddenTags.split(ch + Tuils.EMPTYSTRING);
+                    split = hiddenTags.split(ch + Tuils.EMPTY_STRING);
                 }
                 if(split == null) {
                     split = new String[] {hiddenTags};
@@ -385,12 +387,12 @@ public class RssManager implements XMLPrefsElement {
     }
 
     public String removeFormat(int id) {
-        String output = XMLPrefsManager.removeNode(rssIndexFile, FORMAT_LABEL, new String[] {ID_ATTRIBUTE}, new String[] {String.valueOf(id)});;
+        String output = XMLPrefsManager.removeNode(rssIndexFile, FORMAT_LABEL, new String[] {ID_ATTRIBUTE}, new String[] {String.valueOf(id)});
         if(output == null) {
             return null;
         } else {
-            if (output.length() > 0) return output;
-            return context.getString(R.string.id_notfound);
+            if (!output.isEmpty()) return output;
+            return context.getString(R.string.id_not_found);
         }
     }
 
@@ -406,7 +408,7 @@ public class RssManager implements XMLPrefsElement {
             return null;
         }
         else {
-            if(output.length() > 0) return output;
+            if(!output.isEmpty()) return output;
             else return context.getString(R.string.rss_not_found);
         }
     }
@@ -418,7 +420,7 @@ public class RssManager implements XMLPrefsElement {
         }
 
         String output = builder.toString().trim();
-        if(output.length() == 0) return "[]";
+        if(output.isEmpty()) return "[]";
         return output;
     }
 
@@ -447,7 +449,7 @@ public class RssManager implements XMLPrefsElement {
             return null;
         }
         else {
-            if (output.length() > 0) return output;
+            if (!output.isEmpty()) return output;
             return context.getString(R.string.rss_not_found);
         }
     }
@@ -460,7 +462,7 @@ public class RssManager implements XMLPrefsElement {
             return null;
         }
         else {
-            if (output.length() > 0) return output;
+            if (!output.isEmpty()) return output;
             return context.getString(R.string.rss_not_found);
         }
     }
@@ -473,7 +475,7 @@ public class RssManager implements XMLPrefsElement {
             return null;
         }
         else {
-            if (output.length() > 0) return output;
+            if (!output.isEmpty()) return output;
             return context.getString(R.string.rss_not_found);
         }
     }
@@ -486,7 +488,7 @@ public class RssManager implements XMLPrefsElement {
             return null;
         }
         else {
-            if (output.length() > 0) return output;
+            if (!output.isEmpty()) return output;
             return context.getString(R.string.rss_not_found);
         }
     }
@@ -499,7 +501,7 @@ public class RssManager implements XMLPrefsElement {
             return null;
         }
         else {
-            if (output.length() > 0) return output;
+            if (!output.isEmpty()) return output;
             return context.getString(R.string.rss_not_found);
         }
     }
@@ -512,7 +514,7 @@ public class RssManager implements XMLPrefsElement {
             return null;
         }
         else {
-            if (output.length() > 0) return output;
+            if (!output.isEmpty()) return output;
             return context.getString(R.string.rss_not_found);
         }
     }
@@ -525,7 +527,7 @@ public class RssManager implements XMLPrefsElement {
             return null;
         }
         else {
-            if (output.length() > 0) return output;
+            if (!output.isEmpty()) return output;
             return context.getString(R.string.rss_not_found);
         }
     }
@@ -538,7 +540,7 @@ public class RssManager implements XMLPrefsElement {
             return null;
         }
         else {
-            if (output.length() > 0) return output;
+            if (!output.isEmpty()) return output;
             return context.getString(R.string.rss_not_found);
         }
     }
@@ -551,7 +553,7 @@ public class RssManager implements XMLPrefsElement {
             return null;
         }
         else {
-            if (output.length() > 0) return output;
+            if (!output.isEmpty()) return output;
             return context.getString(R.string.rss_not_found);
         }
     }
@@ -565,7 +567,7 @@ public class RssManager implements XMLPrefsElement {
             return null;
         }
         else {
-            if (output.length() > 0) return output;
+            if (!output.isEmpty()) return output;
             return context.getString(R.string.rss_not_found);
         }
     }
@@ -577,7 +579,7 @@ public class RssManager implements XMLPrefsElement {
             cmdRegexes.add(new CmdableRegex(id, on, regex, cmd));
             return null;
         } else {
-            if(output.length() > 0) return output;
+            if(!output.isEmpty()) return output;
             return context.getString(R.string.output_error);
         }
     }
@@ -591,14 +593,14 @@ public class RssManager implements XMLPrefsElement {
 
             return null;
         } else {
-            if(output.length() > 0) return output;
-            return context.getString(R.string.id_notfound);
+            if(!output.isEmpty()) return output;
+            return context.getString(R.string.id_not_found);
         }
     }
 
 //    base methods
 
-    private Runnable updateRunnable = new Runnable() {
+    private final Runnable updateRunnable = new Runnable() {
         @Override
         public void run() {
             for(Rss feed : feeds) {
@@ -687,7 +689,7 @@ public class RssManager implements XMLPrefsElement {
 
 //                        feed.lMod = response.header(LAST_MODIFIED_FIELD);
 //                        feed.etag = response.header(ETAG_FIELD);
-//                        if(feed.etag != null) feed.etag = feed.etag.replaceAll("\"", Tuils.EMPTYSTRING);
+//                        if(feed.etag != null) feed.etag = feed.etag.replaceAll("\"", Tuils.EMPTY_STRING);
 
                         response.close();
 
@@ -707,11 +709,11 @@ public class RssManager implements XMLPrefsElement {
         }.start();
     }
 
-    private boolean parse(Rss feed, boolean time) throws Exception {
+    private void parse(Rss feed, boolean time) throws Exception {
         boolean updated = false;
 
         File rssFile = new File(root, RSS_LABEL + feed.id + ".xml");
-        if(!rssFile.exists()) return false;
+        if(!rssFile.exists()) return;
 
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -721,7 +723,7 @@ public class RssManager implements XMLPrefsElement {
             doc = dBuilder.parse(rssFile);
         } catch (SAXParseException e) {
             Tuils.sendXMLParseError(context, PATH, e);
-            return false;
+            return;
         }
 
         doc.getDocumentElement().normalize();
@@ -735,7 +737,7 @@ public class RssManager implements XMLPrefsElement {
         NodeList list = doc.getElementsByTagName(entryTag);
         if(list.getLength() == 0) {
             Tuils.sendOutput(Color.RED, context, context.getString(R.string.rss_invalid_entry_tag) + Tuils.SPACE + (entryTag));
-            return false;
+            return;
         }
 
         for(int c = list.getLength(); c >= 0; c--) {
@@ -757,8 +759,8 @@ public class RssManager implements XMLPrefsElement {
                 try {
                     d = feed.timeFormat != null ? feed.timeFormat.parse(date) : defaultRSSDateFormat.parse(date);
                 } catch (Exception e) {
-                    Tuils.sendOutput(Color.RED, context, rssFile.getName() + ": " + context.getString(R.string.rss_invalid_timeformat));
-                    return false;
+                    Tuils.sendOutput(Color.RED, context, rssFile.getName() + ": " + context.getString(R.string.rss_invalid_time_format));
+                    return;
                 }
 
                 long timeLong = d.getTime();
@@ -782,7 +784,6 @@ public class RssManager implements XMLPrefsElement {
             feed.updateLastShownItem(rssIndexFile);
         }
 
-        return updated;
     }
 
     private final Pattern formatPattern = Pattern.compile("%(?:\\[(\\d+)\\])?(?:\\[([^]]+)\\])?([a-zA-Z]+)");
@@ -814,11 +815,11 @@ public class RssManager implements XMLPrefsElement {
                 int cl = feed.color;
 
                 NodeList ls = item.getElementsByTagName(tag);
-                if(ls.getLength() == 0) value = Tuils.EMPTYSTRING;
+                if(ls.getLength() == 0) value = Tuils.EMPTY_STRING;
                 else {
                     value = ls.item(0).getTextContent();
                     if(value != null) value = value.trim();
-                    else value = Tuils.EMPTYSTRING;
+                    else value = Tuils.EMPTY_STRING;
 
                     if(tag.equals(dateTag)) {
                         Date d;
@@ -835,10 +836,10 @@ public class RssManager implements XMLPrefsElement {
                         value = HtmlEscape.unescapeHtml(value);
 
                         for(Pattern p : hideTagPatterns) {
-                            value = p.matcher(value).replaceAll(Tuils.EMPTYSTRING);
+                            value = p.matcher(value).replaceAll(Tuils.EMPTY_STRING);
                         }
 
-                        value = removeTags.matcher(value).replaceAll(Tuils.EMPTYSTRING);
+                        value = removeTags.matcher(value).replaceAll(Tuils.EMPTY_STRING);
 
                         try {
                             int l = Integer.parseInt(length);
@@ -855,7 +856,7 @@ public class RssManager implements XMLPrefsElement {
                 }
 
                 CharSequence replace;
-                if(cl != feed.color && value.length() > 0) {
+                if(cl != feed.color && !value.isEmpty()) {
                     replace = Tuils.span(value, cl);
                 } else {
                     replace = value;
@@ -899,13 +900,13 @@ public class RssManager implements XMLPrefsElement {
             Node n = list.item(0);
             url = n.getTextContent();
 
-            if(n.getNodeType() == Node.ELEMENT_NODE && (url == null || url.length() == 0)) {
+            if(n.getNodeType() == Node.ELEMENT_NODE && (url == null || url.isEmpty())) {
                 url = ((Element) n).getAttribute(HREF_ATTRIBUTE);
             }
         }
 
         String action;
-        if(url == null || url.length() == 0) action = null;
+        if(url == null || url.isEmpty()) action = null;
         else action = OPEN_URL + url;
 
         Tuils.sendOutput(context, s, TerminalManager.CATEGORY_NO_COLOR, click ? action : null);
@@ -1130,7 +1131,7 @@ public class RssManager implements XMLPrefsElement {
         return null;
     }
 
-    private boolean prepare() {
+    private void prepare() {
         boolean check = true;
         if(!root.isDirectory()) {
             check = false;
@@ -1142,18 +1143,18 @@ public class RssManager implements XMLPrefsElement {
                 XMLPrefsManager.resetFile(rssIndexFile, NAME);
                 check = false;
 
-                return check && root.list().length > 1;
+                if (check) {
+                    root.list();
+                }
             } catch (Exception e) {
-                return false;
             }
         }
 
-        return check;
     }
 
     private class CmdableRegex extends RegexManager.Regex {
         int[] on;
-        String cmd;
+        final String cmd;
 
         public CmdableRegex(int id, String on, String regex, String cmd) {
             this.id = id;
@@ -1177,7 +1178,7 @@ public class RssManager implements XMLPrefsElement {
                     }
                 }
 
-                String[] split = on.split(Pattern.quote(separator + Tuils.EMPTYSTRING));
+                String[] split = on.split(Pattern.quote(separator + Tuils.EMPTY_STRING));
                 this.on = new int[split.length];
 
                 for(int c = 0; c < split.length; c++) {

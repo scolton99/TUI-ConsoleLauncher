@@ -3,13 +3,14 @@ package ohi.andre.consolelauncher.commands.main.raw;
 import java.io.File;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.managers.FileManager;
 import ohi.andre.consolelauncher.tuils.Tuils;
 
-public class open implements CommandAbstraction {
+public class open extends AbstractCommand {
 
     @Override
     public String exec(ExecutePack pack) {
@@ -18,10 +19,10 @@ public class open implements CommandAbstraction {
 
         int result = FileManager.openFile(info.context, file);
 
-        if (result == FileManager.ISDIRECTORY) return info.res.getString(R.string.output_isdirectory);
+        if (result == FileManager.ISDIRECTORY) return info.res.getString(R.string.output_is_directory);
         if (result == FileManager.IOERROR) return info.res.getString(R.string.output_error);
 
-        return Tuils.EMPTYSTRING;
+        return Tuils.EMPTY_STRING;
     }
 
     @Override
@@ -31,7 +32,7 @@ public class open implements CommandAbstraction {
 
     @Override
     public int[] argType() {
-        return new int[]{CommandAbstraction.FILE};
+        return new int[]{Command.FILE};
     }
 
     @Override
@@ -48,7 +49,7 @@ public class open implements CommandAbstraction {
     @Override
     public String onArgNotFound(ExecutePack pack, int index) {
         MainPack info = (MainPack) pack;
-        return info.res.getString(R.string.output_filenotfound);
+        return info.res.getString(R.string.output_file_not_found);
     }
 
 }

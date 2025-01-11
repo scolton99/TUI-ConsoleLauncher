@@ -44,6 +44,5 @@ public class Constants {
     public final static String ABOUTANSELM_URI = "http://anselmbros.blogspot.in/p/about-us.html";
     public final static String COMMUNITY_URI = "https://plus.google.com/communities/114100054385968340083";
     public final static String FACEBOOK_URI = "https://facebook.com/torchieapp";
-    public final static String GOOGLEPLUS_URI = "https://plus.google.com/111668132285982978436";
     public final static String WEB_DONATE_URI = "https://torchieapp.wordpress.com/donate/";
 }

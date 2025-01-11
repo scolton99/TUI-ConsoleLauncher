@@ -5,19 +5,19 @@ import android.os.Build;
 
 import ohi.andre.consolelauncher.BuildConfig;
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
-import ohi.andre.consolelauncher.commands.main.specific.APICommand;
 import ohi.andre.consolelauncher.managers.TuiLocationManager;
 
 /**
  * Created by francescoandreuzzi on 10/05/2017.
  */
 
-public class location implements APICommand, CommandAbstraction {
+public class location extends AbstractCommand {
 
-    public static String ACTION_LOCATION_CMD_GOT = BuildConfig.APPLICATION_ID + ".loc_cmd_location";
+    public static final String ACTION_LOCATION_CMD_GOT = BuildConfig.APPLICATION_ID + ".loc_cmd_location";
 
     @Override
     public String exec(final ExecutePack pack) throws Exception {

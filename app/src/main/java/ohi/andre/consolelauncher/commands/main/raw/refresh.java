@@ -1,11 +1,12 @@
 package ohi.andre.consolelauncher.commands.main.raw;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 
-public class refresh implements CommandAbstraction {
+public class refresh extends AbstractCommand {
 
     @Override
     public String exec(ExecutePack pack) {

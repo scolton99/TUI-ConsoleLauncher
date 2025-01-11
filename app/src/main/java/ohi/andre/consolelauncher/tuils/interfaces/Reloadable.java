@@ -20,8 +20,8 @@ public interface Reloadable {
 
     class ReloadMessageCategory {
 
-        public String header;
-        public List<String> lines;
+        public final String header;
+        public final List<String> lines;
 
         public ReloadMessageCategory(String header) {
             this.header = header;

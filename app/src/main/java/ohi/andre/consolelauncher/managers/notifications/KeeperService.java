@@ -10,9 +10,9 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.app.RemoteInput;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.app.RemoteInput;
 import android.text.SpannableString;
 import android.text.TextUtils;
 
@@ -147,7 +147,7 @@ public class KeeperService extends Service {
             startMain.addCategory(Intent.CATEGORY_HOME);
             startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-            if(clickCmd != null && clickCmd.length() > 0) {
+            if(clickCmd != null && !clickCmd.isEmpty()) {
                 startMain.putExtra(PrivateIOReceiver.TEXT, clickCmd);
             }
 
@@ -155,9 +155,9 @@ public class KeeperService extends Service {
                     c,
                     0,
                     startMain,
-                    PendingIntent.FLAG_CANCEL_CURRENT
+                    PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE
             );
-        } else if(clickCmd != null && clickCmd.length() > 0) {
+        } else if(clickCmd != null && !clickCmd.isEmpty()) {
             Intent cmdIntent = new Intent(PublicIOReceiver.ACTION_CMD);
             cmdIntent.putExtra(PrivateIOReceiver.TEXT, clickCmd);
 
@@ -165,7 +165,7 @@ public class KeeperService extends Service {
                     c,
                     0,
                     cmdIntent,
-                    0
+                    PendingIntent.FLAG_IMMUTABLE
             );
         } else {
             pendingIntent = null;
@@ -222,7 +222,7 @@ public class KeeperService extends Service {
             NotificationCompat.Action.Builder actionBuilder = new NotificationCompat.Action.Builder(
                     R.mipmap.ic_launcher,
                     cmdLabel,
-                    PendingIntent.getBroadcast(c.getApplicationContext(), 40, i, PendingIntent.FLAG_UPDATE_CURRENT))
+                    PendingIntent.getBroadcast(c.getApplicationContext(), 40, i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE))
                         .addRemoteInput(remoteInput);
 
             builder.addAction(actionBuilder.build());

@@ -4,7 +4,8 @@ import android.content.Context;
 import android.os.Vibrator;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.tuils.Tuils;
@@ -13,7 +14,7 @@ import ohi.andre.consolelauncher.tuils.Tuils;
  * Created by francescoandreuzzi on 29/04/2017.
  */
 
-public class vibrate implements CommandAbstraction {
+public class vibrate extends AbstractCommand {
 
     @Override
     public String exec(ExecutePack pack) throws Exception {
@@ -42,8 +43,8 @@ public class vibrate implements CommandAbstraction {
                 }
             }
 
-            String[] split = text.split(separator + Tuils.EMPTYSTRING);
-            long pattern[] = new long[split.length];
+            String[] split = text.split(separator + Tuils.EMPTY_STRING);
+            long[] pattern = new long[split.length];
 
             for(int c = 0; c < split.length; c++) {
                 try {
@@ -61,7 +62,7 @@ public class vibrate implements CommandAbstraction {
 
     @Override
     public int[] argType() {
-        return new int[] {CommandAbstraction.PLAIN_TEXT};
+        return new int[] {Command.PLAIN_TEXT};
     }
 
     @Override

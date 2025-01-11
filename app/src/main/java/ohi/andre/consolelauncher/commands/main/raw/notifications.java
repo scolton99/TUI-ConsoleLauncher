@@ -5,10 +5,10 @@ import android.content.Intent;
 import java.io.File;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
-import ohi.andre.consolelauncher.commands.main.specific.APICommand;
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand;
 import ohi.andre.consolelauncher.managers.notifications.NotificationManager;
 import ohi.andre.consolelauncher.tuils.Tuils;
@@ -19,7 +19,7 @@ import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
  * Created by francescoandreuzzi on 29/04/2017.
  */
 
-public class notifications extends ParamCommand implements APICommand {
+public class notifications extends ParamCommand {
 
     @Override
     public boolean willWorkOn(int api) {
@@ -32,36 +32,36 @@ public class notifications extends ParamCommand implements APICommand {
             @Override
             public String exec(ExecutePack pack) {
                 String output = NotificationManager.setState(pack.getLaunchInfo().componentName.getPackageName(), true);
-                if(output == null || output.length() == 0) return null;
+                if(output == null || output.isEmpty()) return null;
                 return output;
             }
 
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.VISIBLE_PACKAGE};
+                return new int[] {Command.VISIBLE_PACKAGE};
             }
 
             @Override
             public String onArgNotFound(ExecutePack pack, int index) {
-                return pack.context.getString(R.string.output_appnotfound);
+                return pack.context.getString(R.string.output_app_not_found);
             }
         },
         exc {
             @Override
             public String exec(ExecutePack pack) {
                 String output = NotificationManager.setState(pack.getLaunchInfo().componentName.getPackageName(), false);
-                if(output == null || output.length() == 0) return null;
+                if(output == null || output.isEmpty()) return null;
                 return output;
             }
 
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.VISIBLE_PACKAGE};
+                return new int[] {Command.VISIBLE_PACKAGE};
             }
 
             @Override
             public String onArgNotFound(ExecutePack pack, int index) {
-                return pack.context.getString(R.string.output_appnotfound);
+                return pack.context.getString(R.string.output_app_not_found);
             }
         },
         color {
@@ -69,20 +69,20 @@ public class notifications extends ParamCommand implements APICommand {
             public String exec(ExecutePack pack) {
                 String color = pack.getString();
                 String output = NotificationManager.setColor(pack.getLaunchInfo().componentName.getPackageName(), color);
-                if(output == null || output.length() == 0) return null;
+                if(output == null || output.isEmpty()) return null;
                 return output;
             }
 
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.COLOR, CommandAbstraction.VISIBLE_PACKAGE};
+                return new int[] {Command.COLOR, Command.VISIBLE_PACKAGE};
             }
 
             @Override
             public String onArgNotFound(ExecutePack pack, int index) {
                 int res;
-                if(index == 1) res = R.string.output_invalidcolor;
-                else res = R.string.output_appnotfound;
+                if(index == 1) res = R.string.output_invalid_color;
+                else res = R.string.output_app_not_found;
 
                 return pack.context.getString(res);
             }
@@ -92,13 +92,13 @@ public class notifications extends ParamCommand implements APICommand {
             public String exec(ExecutePack pack) {
                 String s = pack.getString();
                 String output = NotificationManager.setFormat(pack.getLaunchInfo().componentName.getPackageName(), s);
-                if(output == null || output.length() == 0) return null;
+                if(output == null || output.isEmpty()) return null;
                 return output;
             }
 
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.NO_SPACE_STRING, CommandAbstraction.VISIBLE_PACKAGE};
+                return new int[] {Command.NO_SPACE_STRING, Command.VISIBLE_PACKAGE};
             }
 
             @Override
@@ -111,13 +111,13 @@ public class notifications extends ParamCommand implements APICommand {
             public String exec(ExecutePack pack) {
                 int id = pack.getInt();
                 String output = NotificationManager.addFilter(pack.getString(), id);
-                if(output == null || output.length() == 0) return null;
+                if(output == null || output.isEmpty()) return null;
                 return output;
             }
 
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.INT, CommandAbstraction.PLAIN_TEXT};
+                return new int[] {Command.INT, Command.PLAIN_TEXT};
             }
 
             @Override
@@ -130,13 +130,13 @@ public class notifications extends ParamCommand implements APICommand {
             public String exec(ExecutePack pack) {
                 int id = pack.getInt();
                 String output = NotificationManager.addFormat(pack.getString(), id);
-                if(output == null || output.length() == 0) return null;
+                if(output == null || output.isEmpty()) return null;
                 return output;
             }
 
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.INT, CommandAbstraction.PLAIN_TEXT};
+                return new int[] {Command.INT, Command.PLAIN_TEXT};
             }
 
             @Override
@@ -148,13 +148,13 @@ public class notifications extends ParamCommand implements APICommand {
             @Override
             public String exec(ExecutePack pack) {
                 String output = NotificationManager.rmFilter(pack.getInt());
-                if(output == null || output.length() == 0) return null;
+                if(output == null || output.isEmpty()) return null;
                 return output;
             }
 
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.INT};
+                return new int[] {Command.INT};
             }
 
             @Override
@@ -166,13 +166,13 @@ public class notifications extends ParamCommand implements APICommand {
             @Override
             public String exec(ExecutePack pack) {
                 String output = NotificationManager.rmFormat(pack.getInt());
-                if(output == null || output.length() == 0) return null;
+                if(output == null || output.isEmpty()) return null;
                 return output;
             }
 
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.INT};
+                return new int[] {Command.INT};
             }
 
             @Override

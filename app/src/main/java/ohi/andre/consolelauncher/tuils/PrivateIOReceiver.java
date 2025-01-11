@@ -9,8 +9,8 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v4.app.RemoteInput;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.core.app.RemoteInput;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 
@@ -46,10 +46,10 @@ public class PrivateIOReceiver extends BroadcastReceiver {
     public static final String CURRENT_ID = BuildConfig.APPLICATION_ID + ".current_id";
     public static final String INFO_AREA = BuildConfig.APPLICATION_ID + ".info_area";
 
-    Outputable outputable;
-    Inputable inputable;
+    final Outputable outputable;
+    final Inputable inputable;
 
-    Activity activity;
+    final Activity activity;
 
     public static int currentId = 0;
 
@@ -67,7 +67,7 @@ public class PrivateIOReceiver extends BroadcastReceiver {
         currentId++;
 
         Bundle remoteInput = RemoteInput.getResultsFromIntent(intent);
-        if(remoteInput == null || remoteInput.size() == 0) {
+        if(remoteInput == null || remoteInput.isEmpty()) {
             CharSequence text = intent.getCharSequenceExtra(TEXT);
             if(text == null) text = intent.getStringExtra(TEXT);
             if(text == null) return;

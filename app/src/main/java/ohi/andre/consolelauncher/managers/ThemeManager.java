@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,28 +28,28 @@ import okhttp3.Response;
 
 public class ThemeManager {
 
-    public static String ACTION_APPLY = BuildConfig.APPLICATION_ID + ".theme_apply";
-    public static String ACTION_REVERT = BuildConfig.APPLICATION_ID + ".theme_revert";
-    public static String ACTION_STANDARD = BuildConfig.APPLICATION_ID + ".theme_standard";
+    public static final String ACTION_APPLY = BuildConfig.APPLICATION_ID + ".theme_apply";
+    public static final String ACTION_REVERT = BuildConfig.APPLICATION_ID + ".theme_revert";
+    public static final String ACTION_STANDARD = BuildConfig.APPLICATION_ID + ".theme_standard";
 
-    public static String NAME = "name";
+    public static final String NAME = "name";
 
-    OkHttpClient client;
-    Context context;
-    Reloadable reloadable;
+    final OkHttpClient client;
+    final Context context;
+    final Reloadable reloadable;
 
-    Pattern parser = Pattern.compile("(<SUGGESTIONS>.+<\\/SUGGESTIONS>).*(<THEME>.+<\\/THEME>)", Pattern.DOTALL);
+    final Pattern parser = Pattern.compile("(<SUGGESTIONS>.+<\\/SUGGESTIONS>).*(<THEME>.+<\\/THEME>)", Pattern.DOTALL);
 
-    BroadcastReceiver receiver = new BroadcastReceiver() {
+    final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction().equals(ACTION_APPLY)) {
                 String name = intent.getStringExtra(NAME);
-                if(name == null) return;
 
-//                name needs to be the absolute path
-                if(name.endsWith(".zip")) apply(new File(name));
-                else apply(name);
+                if(name == null)
+                    return;
+
+                apply(name);
             } else if(intent.getAction().equals(ACTION_REVERT)) {
                 revert();
             } else if(intent.getAction().equals(ACTION_STANDARD)) {
@@ -105,10 +105,10 @@ public class ThemeManager {
                     try {
                         string = response.body().string();
                     } catch (IOException e) {
-                        string = Tuils.EMPTYSTRING;
+                        string = Tuils.EMPTY_STRING;
                     }
 
-                    if(string.length() == 0) {
+                    if(string.isEmpty()) {
                         Tuils.sendOutput(context, R.string.theme_not_found);
                         return;
                     }
@@ -126,10 +126,6 @@ public class ThemeManager {
                 }
             }
         }.start();
-    }
-
-    public void apply(File zip) {
-        
     }
 
     private void applyTheme(File theme, File suggestions, boolean keepOld) {
@@ -211,7 +207,7 @@ public class ThemeManager {
     }
 
 //    rgba(255,87,34,1)
-    Pattern colorParser = Pattern.compile("rgba\\([\\s]*(\\d+),[\\s]*(\\d+),[\\s]*(\\d+),[\\s]*(\\d.*\\d*)[\\s]*\\)");
+final Pattern colorParser = Pattern.compile("rgba\\([\\s]*(\\d+),[\\s]*(\\d+),[\\s]*(\\d+),[\\s]*(\\d.*\\d*)[\\s]*\\)");
     private String toHexColor(String color) {
         Matcher m = colorParser.matcher(color);
         if(m.find()) {
@@ -232,7 +228,7 @@ public class ThemeManager {
             String alphaHex = Integer.toHexString((int) alpha);
             if(alphaHex.length() == 1) alphaHex = "0" + alphaHex;
 
-            return "#" + (alpha == 1 ? Tuils.EMPTYSTRING : alphaHex) + redHex + greenHex + blueHex;
-        } else return Tuils.EMPTYSTRING;
+            return "#" + (alpha == 1 ? Tuils.EMPTY_STRING : alphaHex) + redHex + greenHex + blueHex;
+        } else return Tuils.EMPTY_STRING;
     }
 }

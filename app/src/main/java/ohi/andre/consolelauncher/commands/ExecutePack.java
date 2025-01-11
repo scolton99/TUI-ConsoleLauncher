@@ -7,12 +7,11 @@ import java.util.ArrayList;
 import ohi.andre.consolelauncher.managers.AppsManager;
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave;
 
-@SuppressWarnings("deprecation")
 public abstract class ExecutePack {
 
     public Object[] args;
     public Context context;
-    public CommandGroup commandGroup;
+    public final CommandGroup commandGroup;
 
     public int currentIndex = 0;
 

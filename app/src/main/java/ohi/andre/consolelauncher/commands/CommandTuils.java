@@ -10,8 +10,6 @@ import java.util.Collections;
 import java.util.List;
 
 import ohi.andre.consolelauncher.commands.main.MainPack;
-import ohi.andre.consolelauncher.commands.main.Param;
-import ohi.andre.consolelauncher.commands.main.specific.ParamCommand;
 import ohi.andre.consolelauncher.managers.AppsManager;
 import ohi.andre.consolelauncher.managers.ContactManager;
 import ohi.andre.consolelauncher.managers.FileManager;
@@ -25,155 +23,64 @@ import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave;
 import ohi.andre.consolelauncher.managers.xml.options.Apps;
 import ohi.andre.consolelauncher.managers.xml.options.Notifications;
 import ohi.andre.consolelauncher.managers.xml.options.Rss;
-import ohi.andre.consolelauncher.tuils.SimpleMutableEntry;
 import ohi.andre.consolelauncher.tuils.Tuils;
 
 @SuppressLint("DefaultLocale")
 public class CommandTuils {
 
-    private static FileManager.SpecificExtensionFileFilter extensionFileFilter = new FileManager.SpecificExtensionFileFilter();
-    private static FileManager.SpecificNameFileFilter nameFileFilter = new FileManager.SpecificNameFileFilter();
+    private static final FileManager.SpecificExtensionFileFilter extensionFileFilter = new FileManager.SpecificExtensionFileFilter();
+    private static final FileManager.SpecificNameFileFilter nameFileFilter = new FileManager.SpecificNameFileFilter();
 
     public static List<XMLPrefsSave> xmlPrefsEntrys;
     public static List<String> xmlPrefsFiles;
 
-    //	parse a command
-    public static Command parse(String input, ExecutePack info) throws Exception {
-        Command command = new Command();
-
-        String name = CommandTuils.findName(input);
-        if (!Tuils.isAlpha(name))
-            return null;
-
-        CommandAbstraction cmd = info.commandGroup.getCommandByName(name);
-        if (cmd == null) {
-            return null;
-        }
-        command.cmd = cmd;
-
-        input = input.substring(name.length());
-        input = input.trim();
-
-        ArrayList<Object> args = new ArrayList<>();
-        int nArgs = 0;
-        int[] types;
-
-        try {
-            if(cmd instanceof ParamCommand) {
-                ArgInfo arg = param((MainPack) info, (ParamCommand) cmd, input);
-                if(arg == null || !arg.found) {
-
-                    command.indexNotFound = 0;
-                    args.add(input);
-                    command.nArgs = 1;
-                    command.mArgs = args.toArray(new Object[args.size()]);
-                    return command;
-                }
-
-                input = arg.residualString;
-                Param p = (Param) arg.arg;
-                types = p.args();
-
-                nArgs++;
-                args.add(p);
-            } else {
-                types = cmd.argType();
-            }
-
-            if (types != null) {
-                for (int count = 0; count < types.length; count++) {
-                    if (input == null) break;
-
-                    input = input.trim();
-                    if(input.length() == 0) {
-                        break;
-                    }
-
-                    ArgInfo arg = CommandTuils.getArg(info, input, types[count]);
-                    if(arg == null) {
-                        return null;
-                    }
-
-                    if (!arg.found) {
-                        command.indexNotFound = cmd instanceof ParamCommand ? count + 1 : count;
-                        args.add(input);
-                        command.mArgs = args.toArray(new Object[args.size()]);
-                        command.nArgs = nArgs;
-                        return command;
-                    }
-
-                    nArgs += arg.n;
-                    args.add(arg.arg);
-                    input = arg.residualString;
-                }
-            }
-        } catch (Exception e) {
-            Tuils.log(e);
-        }
-
-        command.mArgs = args.toArray(new Object[args.size()]);
-        command.nArgs = nArgs;
-
-        return command;
-    }
-
-    //	find command name
-    private static String findName(String input) {
-        int space = input.indexOf(Tuils.SPACE);
-
-        if (space == -1) {
-            return input;
-        } else {
-            return input.substring(0, space);
-        }
-    }
 
     //	find args
     public static ArgInfo getArg(ExecutePack info, String input, int type) {
-        if (type == CommandAbstraction.FILE && info instanceof MainPack) {
+        if (type == Command.FILE && info instanceof MainPack) {
             MainPack pack = (MainPack) info;
             return file(input, pack.currentDirectory);
-        } else if (type == CommandAbstraction.CONTACTNUMBER && info instanceof MainPack) {
+        } else if (type == Command.CONTACTNUMBER && info instanceof MainPack) {
             MainPack pack = (MainPack) info;
             return contactNumber(input, pack.contacts);
-        } else if (type == CommandAbstraction.PLAIN_TEXT) {
+        } else if (type == Command.PLAIN_TEXT) {
             return plainText(input);
-        } else if (type == CommandAbstraction.VISIBLE_PACKAGE && info instanceof MainPack) {
+        } else if (type == Command.VISIBLE_PACKAGE && info instanceof MainPack) {
             MainPack pack = (MainPack) info;
             return activityName(input, pack.appsManager);
-        } else if (type == CommandAbstraction.HIDDEN_PACKAGE && info instanceof MainPack) {
+        } else if (type == Command.HIDDEN_PACKAGE && info instanceof MainPack) {
             MainPack pack = (MainPack) info;
             return hiddenPackage(input, pack.appsManager);
-        } else if (type == CommandAbstraction.TEXTLIST) {
+        } else if (type == Command.TEXTLIST) {
             return textList(input);
-        } else if (type == CommandAbstraction.SONG && info instanceof MainPack) {
+        } else if (type == Command.SONG && info instanceof MainPack) {
             MainPack pack = (MainPack) info;
             if(pack.player == null) return null;
 
             return song(input, pack.player);
-        } else if (type == CommandAbstraction.COMMAND) {
+        } else if (type == Command.COMMAND) {
             return command(input, info.commandGroup);
-        } else if(type == CommandAbstraction.BOOLEAN) {
+        } else if(type == Command.BOOLEAN) {
             return bln(input);
-        } else if(type == CommandAbstraction.COLOR) {
+        } else if(type == Command.COLOR) {
             return color(input);
-        } else if(type == CommandAbstraction.CONFIG_ENTRY) {
+        } else if(type == Command.CONFIG_ENTRY) {
             return configEntry(input);
-        } else if(type == CommandAbstraction.CONFIG_FILE) {
+        } else if(type == Command.CONFIG_FILE) {
             return configFile(input);
-        } else if(type == CommandAbstraction.INT) {
+        } else if(type == Command.INT) {
             return integer(input);
-        } else if(type == CommandAbstraction.DEFAULT_APP) {
+        } else if(type == Command.DEFAULT_APP) {
             return defaultApp(input, ((MainPack) info).appsManager);
-        } else if(type == CommandAbstraction.ALL_PACKAGES) {
+        } else if(type == Command.ALL_PACKAGES) {
             return allPackages(input, ((MainPack) info).appsManager);
-        } else if(type == CommandAbstraction.NO_SPACE_STRING || type == CommandAbstraction.APP_GROUP || type == CommandAbstraction.BOUND_REPLY_APP) {
+        } else if(type == Command.NO_SPACE_STRING || type == Command.APP_GROUP || type == Command.BOUND_REPLY_APP) {
             return noSpaceString(input);
-        } else if(type == CommandAbstraction.APP_INSIDE_GROUP) {
+        } else if(type == Command.APP_INSIDE_GROUP) {
             return activityName(input, ((MainPack) info).appsManager);
-        } else if(type == CommandAbstraction.LONG) {
+        } else if(type == Command.LONG) {
             return numberLong(input);
-        } else if(type == CommandAbstraction.DATASTORE_PATH_TYPE) {
+        } else if(type == Command.DATASTORE_PATH_TYPE) {
             return dataStoreType(input);
         }
 
@@ -219,7 +126,7 @@ public class CommandTuils {
 
         int space = input.indexOf(Tuils.SPACE);
         String cl = input.substring(0, space == -1 ? input.length() : space);
-        input = space == -1 ? Tuils.EMPTYSTRING : input.substring(space + 1);
+        input = space == -1 ? Tuils.EMPTY_STRING : input.substring(space + 1);
 
         try {
             Color.parseColor(cl);
@@ -241,7 +148,7 @@ public class CommandTuils {
         }
 
         Object result = Boolean.parseBoolean(used);
-        return new ArgInfo(result, notUsed, used.length() > 0, used.length() > 0 ? 1 : 0);
+        return new ArgInfo(result, notUsed, !used.isEmpty(), !used.isEmpty() ? 1 : 0);
     }
 
     private static ArgInfo plainText(String input) {
@@ -272,7 +179,7 @@ public class CommandTuils {
         ArgInfo i = noSpaceString(string);
         string = (String) i.arg;
 
-        CommandAbstraction abstraction = null;
+        Command abstraction = null;
         try {
             abstraction = active.getCommandByName(string);
         } catch (Exception e) {
@@ -306,7 +213,7 @@ public class CommandTuils {
 
         List<String> strings = (List<String>) CommandTuils.textList(input).arg;
 
-        String toVerify = Tuils.EMPTYSTRING;
+        String toVerify = Tuils.EMPTY_STRING;
         for (int count = 0; count < strings.size(); count++) {
             toVerify = toVerify.concat(strings.get(count));
 
@@ -330,7 +237,7 @@ public class CommandTuils {
 //        List<File> files = new ArrayList<>();
 //        List<String> strings = (List<String>) CommandTuils.textList(input).arg;
 //
-//        String toVerify = Tuils.EMPTYSTRING;
+//        String toVerify = Tuils.EMPTY_STRING;
 //        for (int count = 0; count < strings.size(); count++) {
 //            String s = strings.get(count);
 //
@@ -340,7 +247,7 @@ public class CommandTuils {
 //            if (dir.notFound == null) {
 //                files.add(dir.file);
 //
-//                toVerify = Tuils.EMPTYSTRING;
+//                toVerify = Tuils.EMPTY_STRING;
 //                continue;
 //            }
 //
@@ -348,7 +255,7 @@ public class CommandTuils {
 //            if (tempFiles != null) {
 //                files.addAll(tempFiles);
 //
-//                toVerify = Tuils.EMPTYSTRING;
+//                toVerify = Tuils.EMPTY_STRING;
 //                continue;
 //            }
 //
@@ -388,29 +295,11 @@ public class CommandTuils {
             return null;
         }
 
-        if (files.size() > 0) {
+        if (!files.isEmpty()) {
             return files;
         } else {
             return null;
         }
-    }
-
-    private static ArgInfo param(MainPack pack, ParamCommand cmd, String input) {
-        if(input == null || input.trim().length() == 0) return null;
-
-        int indexOfFirstSpace = input.indexOf(Tuils.SPACE);
-        if (indexOfFirstSpace == -1) {
-            indexOfFirstSpace = input.length();
-        }
-
-        String param = input.substring(0, indexOfFirstSpace).trim();
-        if(!param.startsWith("-")) param = "-".concat(param);
-
-        SimpleMutableEntry<Boolean, Param> sm = cmd.getParam(pack, param);
-        Param p = sm.getValue();
-        boolean df = sm.getKey();
-
-        return new ArgInfo(p, df ? input : input.substring(indexOfFirstSpace), p != null, p != null ? 1 : 0);
     }
 
     private static ArgInfo activityName(String input, AppsManager apps) {
@@ -521,9 +410,9 @@ public class CommandTuils {
     }
 
     public static class ArgInfo {
-        public Object arg;
-        public String residualString;
-        public int n;
+        public final Object arg;
+        public final String residualString;
+        public final int n;
         public boolean found;
 
         public ArgInfo(Object arg, String residualString, boolean found, int nFound) {

@@ -10,19 +10,19 @@ import android.os.Build;
 import java.lang.reflect.Field;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
-import ohi.andre.consolelauncher.commands.main.specific.APICommand;
 import ohi.andre.consolelauncher.tuils.Tuils;
 
-public class data implements APICommand, CommandAbstraction {
+public class data extends AbstractCommand {
 
     @Override
     public String exec(ExecutePack pack) {
         MainPack info = (MainPack) pack;
         boolean active = toggle(info);
-        return info.res.getString(R.string.output_data) + Tuils.SPACE + Boolean.toString(active);
+        return info.res.getString(R.string.output_data) + Tuils.SPACE + active;
     }
 
     private boolean toggle(MainPack info) {

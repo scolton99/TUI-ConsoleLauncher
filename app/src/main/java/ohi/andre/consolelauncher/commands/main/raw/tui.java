@@ -5,7 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.io.File;
 
@@ -13,7 +13,8 @@ import ohi.andre.consolelauncher.BuildConfig;
 import ohi.andre.consolelauncher.LauncherActivity;
 import ohi.andre.consolelauncher.R;
 import ohi.andre.consolelauncher.UIManager;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.CommandsPreferences;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
@@ -52,14 +53,14 @@ public class tui extends ParamCommand {
             public String exec(ExecutePack pack) {
                 MainPack info = (MainPack) pack;
                 return "Version:" + Tuils.SPACE + BuildConfig.VERSION_NAME + " (code: " + BuildConfig.VERSION_CODE + ")" +
-                        (BuildConfig.DEBUG ? Tuils.NEWLINE + BuildConfig.BUILD_TYPE : Tuils.EMPTYSTRING) +
+                        (BuildConfig.DEBUG ? Tuils.NEWLINE + BuildConfig.BUILD_TYPE : Tuils.EMPTY_STRING) +
                         Tuils.NEWLINE + Tuils.NEWLINE + info.res.getString(R.string.output_about);
             }
         },
         log {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.PLAIN_TEXT};
+                return new int[] {Command.PLAIN_TEXT};
             }
 
             @Override
@@ -79,7 +80,7 @@ public class tui extends ParamCommand {
         priority {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.COMMAND, CommandAbstraction.INT};
+                return new int[] {Command.COMMAND, Command.INT};
             }
 
             @Override
@@ -95,20 +96,13 @@ public class tui extends ParamCommand {
 
             @Override
             public String onArgNotFound(ExecutePack pack, int index) {
-                return pack.context.getString(R.string.output_invalidarg);
+                return pack.context.getString(R.string.output_invalid_argument);
             }
         },
         telegram {
             @Override
             public String exec(ExecutePack pack) {
                 pack.context.startActivity(Tuils.webPage("https://t.me/tuilauncher"));
-                return null;
-            }
-        },
-        googlep {
-            @Override
-            public String exec(ExecutePack pack) {
-                pack.context.startActivity(Tuils.webPage("https://plus.google.com/communities/103936578623101446195"));
                 return null;
             }
         },
@@ -157,7 +151,7 @@ public class tui extends ParamCommand {
 //        exclude_message {
 //            @Override
 //            public int[] args() {
-//                return new int[] {CommandAbstraction.INT};
+//                return new int[] {Command.INT};
 //            }
 //
 //            @Override

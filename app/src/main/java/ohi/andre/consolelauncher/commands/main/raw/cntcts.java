@@ -5,14 +5,15 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.provider.ContactsContract;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import java.util.List;
 
 import ohi.andre.consolelauncher.LauncherActivity;
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand;
@@ -60,7 +61,7 @@ public class cntcts extends ParamCommand {
             public String exec(ExecutePack pack) {
                 if (ContextCompat.checkSelfPermission(pack.context, Manifest.permission.WRITE_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions((Activity) pack.context, new String[]{Manifest.permission.WRITE_CONTACTS}, LauncherActivity.COMMAND_REQUEST_PERMISSION);
-                    return pack.context.getString(R.string.output_waitingpermission);
+                    return pack.context.getString(R.string.output_waiting_permissions);
                 }
 
                 ((MainPack) pack).contacts.delete(pack.getString());
@@ -69,12 +70,12 @@ public class cntcts extends ParamCommand {
 
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.CONTACTNUMBER};
+                return new int[] {Command.CONTACTNUMBER};
             }
 
             @Override
             public String onArgNotFound(ExecutePack pack, int index) {
-                return pack.context.getString(R.string.output_numbernotfound);
+                return pack.context.getString(R.string.output_contact_not_found);
             }
         },
         edit {
@@ -89,12 +90,12 @@ public class cntcts extends ParamCommand {
 
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.CONTACTNUMBER};
+                return new int[] {Command.CONTACTNUMBER};
             }
 
             @Override
             public String onArgNotFound(ExecutePack pack, int index) {
-                return pack.context.getString(R.string.output_numbernotfound);
+                return pack.context.getString(R.string.output_contact_not_found);
             }
         },
         l {
@@ -113,12 +114,12 @@ public class cntcts extends ParamCommand {
 
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.CONTACTNUMBER};
+                return new int[] {Command.CONTACTNUMBER};
             }
 
             @Override
             public String onArgNotFound(ExecutePack pack, int index) {
-                return pack.context.getString(R.string.output_numbernotfound);
+                return pack.context.getString(R.string.output_contact_not_found);
             }
         };
 
@@ -154,7 +155,7 @@ public class cntcts extends ParamCommand {
 
         @Override
         public String onNotArgEnough(ExecutePack pack, int n) {
-            return pack.context.getString(R.string.help_cntcts);
+            return pack.context.getString(R.string.help_contacts);
         }
     }
 
@@ -172,7 +173,7 @@ public class cntcts extends ParamCommand {
     protected String doThings(ExecutePack pack) {
         if (ContextCompat.checkSelfPermission(pack.context, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions((Activity) pack.context, new String[]{Manifest.permission.READ_CONTACTS}, LauncherActivity.COMMAND_REQUEST_PERMISSION);
-            return pack.context.getString(R.string.output_waitingpermission);
+            return pack.context.getString(R.string.output_waiting_permissions);
         }
         return null;
     }
@@ -184,6 +185,6 @@ public class cntcts extends ParamCommand {
 
     @Override
     public int helpRes() {
-        return R.string.help_cntcts;
+        return R.string.help_contacts;
     }
 }

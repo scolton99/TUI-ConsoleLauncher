@@ -1,9 +1,5 @@
 package ohi.andre.consolelauncher.managers.notifications;
 
-/**
- * Created by francescoandreuzzi on 03/09/2017.
- */
-
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -12,7 +8,9 @@ import android.os.IBinder;
 
 import ohi.andre.consolelauncher.tuils.Tuils;
 
-
+/**
+ * Created by francescoandreuzzi on 03/09/2017.
+ */
 public class NotificationMonitorService extends Service {
 
     @Override

@@ -1,19 +1,21 @@
 package ohi.andre.consolelauncher.commands.main.specific;
 
+import java.util.AbstractMap;
+
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.commands.main.Param;
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave;
-import ohi.andre.consolelauncher.tuils.SimpleMutableEntry;
 import ohi.andre.consolelauncher.tuils.Tuils;
 
 /**
  * Created by francescoandreuzzi on 01/05/2017.
  */
 
-public abstract class ParamCommand implements CommandAbstraction {
+public abstract class ParamCommand extends AbstractCommand {
 
 //    copy this
     /*
@@ -63,7 +65,7 @@ public abstract class ParamCommand implements CommandAbstraction {
 
     @Override
     public final int[] argType() {
-        return new int[] {CommandAbstraction.PARAM};
+        return new int[] {Command.PARAM};
     }
 
     @Override
@@ -75,18 +77,22 @@ public abstract class ParamCommand implements CommandAbstraction {
         if(param == null) {
             Object o1 = pack.get(Object.class, 0);
 
-            if(o1 == null || o1.toString().length() == 0) return pack.context.getString(helpRes());
-            else return pack.context.getString(R.string.output_invalid_param) + Tuils.SPACE + o1.toString();
+            if(o1 == null || o1.toString().isEmpty()) return pack.context.getString(helpRes());
+            else return pack.context.getString(R.string.output_invalid_param) + Tuils.SPACE + o1;
         }
         return param.exec(pack);
     }
 
-    public SimpleMutableEntry<Boolean, Param> getParam(MainPack pack, String param) {
+    public AbstractMap.SimpleEntry<Boolean, Param> getParam(MainPack pack, String param) {
+        // What we're really getting here is a subcommand
         Param p = paramForString(pack, param);
-        if(p == null && defaultParamReference() != null) {
-            return new SimpleMutableEntry<>(true, paramForString(pack, defaultParam(pack)));
-        }
-        return new SimpleMutableEntry<>(false, p);
+
+        // This allows a default subcommand to be chosen if the given one doesn't exist
+        if(p == null && defaultParamReference() != null)
+            return new AbstractMap.SimpleEntry<>(true, paramForString(pack, defaultParam(pack)));
+
+        // Otherwise, return the subcommand (indicate that it is not the default)
+        return new AbstractMap.SimpleEntry<>(false, p);
     }
 
     public String defaultParam(MainPack pack) {

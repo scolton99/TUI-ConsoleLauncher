@@ -4,7 +4,8 @@ import android.media.AudioManager;
 import android.media.ToneGenerator;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 
@@ -12,7 +13,7 @@ import ohi.andre.consolelauncher.commands.main.MainPack;
  * Created by francescoandreuzzi on 29/04/2017.
  */
 
-public class beep implements CommandAbstraction {
+public class beep extends AbstractCommand {
 
     @Override
     public String exec(ExecutePack pack) throws Exception {

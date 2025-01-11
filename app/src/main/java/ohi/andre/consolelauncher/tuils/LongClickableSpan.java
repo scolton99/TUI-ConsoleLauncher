@@ -6,10 +6,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Vibrator;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.text.TextPaint;
 import android.text.style.ClickableSpan;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
 
@@ -28,8 +27,9 @@ public class LongClickableSpan extends ClickableSpan {
 
     public static int longPressVibrateDuration = -1;
 
-    private Object clickO, longClickO;
-    private String longIntentKey;
+    private final Object clickO;
+    private final Object longClickO;
+    private final String longIntentKey;
 
     private static boolean set = false, showMenu;
     private static boolean showExcludeApp, showExcludeNotification, showReply;
@@ -75,8 +75,8 @@ public class LongClickableSpan extends ClickableSpan {
         if(execute(widget, longClickO, longIntentKey) && longPressVibrateDuration > 0) ((Vibrator) widget.getContext().getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE)).vibrate(longPressVibrateDuration);
     }
 
-    private static boolean execute(View v, Object o) {
-        return execute(v, o, null);
+    private static void execute(View v, Object o) {
+        execute(v, o, null);
     }
 
     private static boolean execute(final View v, Object o, String intentKey) {

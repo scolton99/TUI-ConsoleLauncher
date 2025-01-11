@@ -3,10 +3,11 @@ package ohi.andre.consolelauncher.commands.main.raw;
 import android.content.ComponentName;
 import android.content.Intent;
 
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 
-public class la implements CommandAbstraction {
+public class la extends AbstractCommand {
     @Override
     public String exec(ExecutePack pack) throws Exception {
         String arg = pack.get(String.class, 0);
@@ -32,7 +33,7 @@ public class la implements CommandAbstraction {
 
     @Override
     public int[] argType() {
-        return new int[] { CommandAbstraction.PLAIN_TEXT };
+        return new int[] { Command.PLAIN_TEXT };
     }
 
     @Override

@@ -3,11 +3,11 @@ package ohi.andre.consolelauncher.commands.tuixt.raw;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.tuixt.TuixtPack;
 import ohi.andre.consolelauncher.tuils.Tuils;
@@ -16,20 +16,20 @@ import ohi.andre.consolelauncher.tuils.Tuils;
  * Created by francescoandreuzzi on 24/01/2017.
  */
 
-public class help implements CommandAbstraction {
+public class help extends AbstractCommand {
 
     @Override
     public String exec(ExecutePack info) throws Exception {
         TuixtPack pack = (TuixtPack) info;
 
-        CommandAbstraction cmd = info.get(CommandAbstraction.class);
-        int res = cmd == null ? R.string.output_commandnotfound : cmd.helpRes();
+        Command cmd = info.get(Command.class);
+        int res = cmd == null ? R.string.output_command_not_found : cmd.helpRes();
         return pack.resources.getString(res);
     }
 
     @Override
     public int[] argType() {
-        return new int[] {CommandAbstraction.COMMAND};
+        return new int[] {Command.COMMAND};
     }
 
     @Override
@@ -50,14 +50,12 @@ public class help implements CommandAbstraction {
     @Override
     public String onNotArgEnough(ExecutePack pack, int nArgs) {
         TuixtPack info = (TuixtPack) pack;
-        List<String> toPrint = new ArrayList<>(Arrays.asList(info.commandGroup.getCommandNames()));
-
-        Collections.sort(toPrint, Tuils::alphabeticCompare);
+        List<String> toPrint = info.commandGroup.getCommandNamesAlphabetical();
 
         Tuils.addPrefix(toPrint, Tuils.DOUBLE_SPACE);
         Tuils.addSeparator(toPrint, Tuils.TRIBLE_SPACE);
         Tuils.insertHeaders(toPrint, true);
 
-        return Tuils.toPlanString(toPrint, Tuils.EMPTYSTRING);
+        return Tuils.toPlanString(toPrint, Tuils.EMPTY_STRING);
     }
 }

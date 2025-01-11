@@ -1,14 +1,17 @@
 package ohi.andre.consolelauncher.commands.main.raw;
 
+import android.util.Log;
+
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand;
 import ohi.andre.consolelauncher.managers.music.MusicManager2;
 import ohi.andre.consolelauncher.managers.music.Song;
 import ohi.andre.consolelauncher.tuils.Tuils;
-import ohi.andre.consolelauncher.tuils.libsuperuser.Shell;
+import eu.chainfire.libsuperuser.Shell;
 
 public class music extends ParamCommand {
 
@@ -45,7 +48,7 @@ public class music extends ParamCommand {
 
             @Override
             public String exec(ExecutePack pack) {
-                if(((MainPack) pack).player == null) return pack.context.getString(R.string.output_musicdisabled);
+                if(((MainPack) pack).player == null) return pack.context.getString(R.string.output_music_disabled);
 
                 return ((MainPack) pack).player.lsSongs();
             }
@@ -59,9 +62,8 @@ public class music extends ParamCommand {
                     return null;
                 }
 
-                String title = ((MainPack) pack).player.play();
-                if(title == null) return null;
-                return pack.context.getString(R.string.output_playing) + Tuils.SPACE + title;
+                ((MainPack) pack).player.play();
+                return pack.context.getString(R.string.output_playing) + Tuils.SPACE + "TITLE NOT IMPLEMENTED";
             }
         },
         stop {
@@ -80,12 +82,12 @@ public class music extends ParamCommand {
         select {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.SONG};
+                return new int[] {Command.SONG};
             }
 
             @Override
             public String exec(ExecutePack pack) {
-                if(((MainPack) pack).player == null) return pack.context.getString(R.string.output_musicdisabled);
+                if(((MainPack) pack).player == null) return pack.context.getString(R.string.output_music_disabled);
 
                 String s = pack.getString();
                 ((MainPack) pack).player.select(s);
@@ -94,20 +96,20 @@ public class music extends ParamCommand {
 
             @Override
             public String onArgNotFound(ExecutePack pack, int indexNotFound) {
-                return pack.context.getString(R.string.output_songnotfound);
+                return pack.context.getString(R.string.output_song_not_found);
             }
         },
         info {
 
             @Override
             public String exec(ExecutePack pack) {
-                if(((MainPack) pack).player == null) return pack.context.getString(R.string.output_musicdisabled);
+                if(((MainPack) pack).player == null) return pack.context.getString(R.string.output_music_disabled);
 
                 StringBuilder builder = new StringBuilder();
 
                 MusicManager2 m = ((MainPack) pack).player;
                 Song song = m.get(m.getSongIndex());
-                if(song == null) return pack.context.getString(R.string.output_songnotfound);
+                if(song == null) return pack.context.getString(R.string.output_song_not_found);
 
                 builder.append("Name: ").append(song.getTitle()).append(Tuils.NEWLINE);
                 if(song.getID() == -1) builder.append("Path: ").append(song.getPath()).append(Tuils.NEWLINE);
@@ -134,12 +136,12 @@ public class music extends ParamCommand {
         seekto {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.INT};
+                return new int[] {Command.INT};
             }
 
             @Override
             public String exec(ExecutePack pack) {
-                if(((MainPack) pack).player == null) return pack.context.getString(R.string.output_musicdisabled);
+                if(((MainPack) pack).player == null) return pack.context.getString(R.string.output_music_disabled);
 
                 ((MainPack) pack).player.seekTo(pack.getInt() * 1000);
                 return null;
@@ -193,7 +195,11 @@ public class music extends ParamCommand {
     }
 
     private static void execute(String code) {
-        Shell.SH.run("input keyevent KEYCODE_MEDIA_" + code);
+        try {
+            Shell.Pool.SH.run("input keyevent KEYCODE_MEDIA_" + code);
+        } catch (Shell.ShellDiedException e) {
+            Log.e(Tuils.LOG_TAG, "Error in music command", e);
+        }
     }
 
     @Override

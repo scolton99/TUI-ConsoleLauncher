@@ -10,10 +10,10 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,12 +28,12 @@ import ohi.andre.consolelauncher.tuils.Tuils;
 
 public class ContactManager {
 
-    public static String ACTION_REFRESH = BuildConfig.APPLICATION_ID + ".refresh_contacts";
+    public static final String ACTION_REFRESH = BuildConfig.APPLICATION_ID + ".refresh_contacts";
 
-    private Context context;
+    private final Context context;
     private List<Contact> contacts;
 
-    private BroadcastReceiver receiver;
+    private final BroadcastReceiver receiver;
 
     public ContactManager(Context context) {
         this.context = context;
@@ -101,7 +101,7 @@ public class ContactManager {
                             defaultNumber = lastNumbers.size();
                         }
 
-                        if(number == null || number.length() == 0) continue;
+                        if(number == null || number.isEmpty()) continue;
 
                         if(phones.isFirst()) {
                             lastId = id;
@@ -119,7 +119,7 @@ public class ContactManager {
                             name = phones.getString(phones.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
                         }
 
-                        String normalized = number.replaceAll(Tuils.SPACE, Tuils.EMPTYSTRING);
+                        String normalized = number.replaceAll(Tuils.SPACE, Tuils.EMPTY_STRING);
                         if(!nrml.contains(normalized)) {
                             nrml.add(normalized);
                             lastNumbers.add(number);
@@ -135,7 +135,7 @@ public class ContactManager {
                 Iterator<Contact> iterator = contacts.iterator();
                 while(iterator.hasNext()) {
                     Contact c = iterator.next();
-                    if(c.numbers.size() == 0) iterator.remove();
+                    if(c.numbers.isEmpty()) iterator.remove();
                 }
 
                 Collections.sort(contacts);
@@ -144,7 +144,7 @@ public class ContactManager {
     }
 
     public List<String> listNames() {
-        if(contacts == null || contacts.size() == 0) refreshContacts(context);
+        if(contacts == null || contacts.isEmpty()) refreshContacts(context);
 
         List<String> names = new ArrayList<>();
         for(Contact c : contacts) names.add(c.name);
@@ -152,13 +152,13 @@ public class ContactManager {
     }
 
     public List<Contact> getContacts() {
-        if(contacts == null || contacts.size() == 0) refreshContacts(context);
+        if(contacts == null || contacts.isEmpty()) refreshContacts(context);
 
         return new ArrayList<>(contacts);
     }
 
     public List<String> listNamesAndNumbers() {
-        if(contacts == null || contacts.size() == 0) refreshContacts(context);
+        if(contacts == null || contacts.isEmpty()) refreshContacts(context);
 
         List<String> c = new ArrayList<>();
 
@@ -212,7 +212,7 @@ public class ContactManager {
         mCursor.moveToNext();
 
         about[NAME] = mCursor.getString(mCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-        about[NUMBERS] = new String(Tuils.EMPTYSTRING);
+        about[NUMBERS] = new String(Tuils.EMPTY_STRING);
 
         int timesContacted = -1;
         long lastContacted = Long.MAX_VALUE;
@@ -224,7 +224,7 @@ public class ContactManager {
             if(tempL > 0) lastContacted = tempL < lastContacted ? tempL : lastContacted;
 
             String n = mCursor.getString(mCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-            about[NUMBERS] = (about[NUMBERS].length() > 0 ? about[NUMBERS] + Tuils.NEWLINE : Tuils.EMPTYSTRING) + n;
+            about[NUMBERS] = (!about[NUMBERS].isEmpty() ? about[NUMBERS] + Tuils.NEWLINE : Tuils.EMPTY_STRING) + n;
         } while (mCursor.moveToNext());
 
         about[TIME_CONTACTED] = String.valueOf(timesContacted);
@@ -232,7 +232,7 @@ public class ContactManager {
             long difference = System.currentTimeMillis() - lastContacted;
             long sc = difference / 1000;
             if(sc < 60) {
-                about[LAST_CONTACTED] = "sec: " + String.valueOf(lastContacted);
+                about[LAST_CONTACTED] = "sec: " + lastContacted;
             } else {
                 int ms = (int) (sc / 60);
                 sc = ms % 60;
@@ -261,15 +261,15 @@ public class ContactManager {
         for(int count = 0; count < contacts.size(); count++) {
             Contact c = contacts.get(count);
             if(c.name.equalsIgnoreCase(name)) {
-                if(c.numbers.size() > 0) return c.numbers.get(0);
+                if(!c.numbers.isEmpty()) return c.numbers.get(0);
             }
         }
 
         return null;
     }
 
-    public boolean delete(String phone) {
-        return context.getContentResolver().delete(fromPhone(phone), null, null) > 0;
+    public void delete(String phone) {
+        context.getContentResolver().delete(fromPhone(phone), null, null);
     }
 
     public Uri fromPhone(String phone) {
@@ -301,8 +301,9 @@ public class ContactManager {
     }
 
     public static class Contact implements Comparable<Contact>, StringableObject {
-        public String name, lowercaseName;
-        public List<String> numbers;
+        public final String name;
+        public final String lowercaseName;
+        public final List<String> numbers;
 
         private int selectedNumber;
 

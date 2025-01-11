@@ -27,7 +27,7 @@ public class LongClickMovementMethod extends LinkMovementMethod {
         public void run() {
             wasActivated = true;
         }
-    };
+    }
 
     private WasActivatedRunnable runnable;
 

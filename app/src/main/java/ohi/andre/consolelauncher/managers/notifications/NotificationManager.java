@@ -39,11 +39,11 @@ import static ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.writeTo;
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class NotificationManager implements XMLPrefsElement {
 
-    private static String COLOR_ATTRIBUTE = "color";
-    public static String ENABLED_ATTRIBUTE = "enabled";
-    public static String ID_ATTRIBUTE = "id";
-    public static String FORMAT_ATTRIBUTE = "format";
-    public static String FILTER_ATTRIBUTE = "filter";
+    private static final String COLOR_ATTRIBUTE = "color";
+    public static final String ENABLED_ATTRIBUTE = "enabled";
+    public static final String ID_ATTRIBUTE = "id";
+    public static final String FORMAT_ATTRIBUTE = "format";
+    public static final String FILTER_ATTRIBUTE = "filter";
 
     public static final String PATH = "notifications.xml";
     private static final String NAME = "NOTIFICATIONS";
@@ -93,7 +93,7 @@ public class NotificationManager implements XMLPrefsElement {
         try {
             File r = Tuils.getFolder();
             if(r == null) {
-                Tuils.sendOutput(Color.RED, context, R.string.tuinotfound_notifications);
+                Tuils.sendOutput(Color.RED, context, context.getString(R.string.tui_folder_not_found, "notifications"));
                 return;
             }
 
@@ -201,7 +201,7 @@ public class NotificationManager implements XMLPrefsElement {
                 }
             }
 
-            if (enums.size() > 0) {
+            if (!enums.isEmpty()) {
                 for (XMLPrefsSave s : enums) {
                     String value = s.defaultValue();
 
@@ -317,8 +317,10 @@ public class NotificationManager implements XMLPrefsElement {
     }
 
     public static class NotificatedApp {
-        String pkg, color, format;
-        boolean enabled;
+        final String pkg;
+        final String color;
+        String format;
+        final boolean enabled;
 
         public NotificatedApp(String pkg, String color, String format, boolean enabled) {
             this.pkg = pkg;

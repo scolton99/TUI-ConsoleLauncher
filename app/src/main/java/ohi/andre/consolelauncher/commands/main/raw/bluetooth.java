@@ -3,11 +3,12 @@ package ohi.andre.consolelauncher.commands.main.raw;
 import android.bluetooth.BluetoothAdapter;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 
-public class bluetooth implements CommandAbstraction {
+public class bluetooth extends AbstractCommand {
 
     @Override
     public String exec(ExecutePack pack) {

@@ -4,11 +4,12 @@ import android.content.Context;
 import android.net.wifi.WifiManager;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 
-public class wifi implements CommandAbstraction {
+public class wifi extends AbstractCommand {
 
     @Override
     public String exec(ExecutePack pack) {
@@ -17,7 +18,7 @@ public class wifi implements CommandAbstraction {
             info.wifi = (WifiManager) info.context.getSystemService(Context.WIFI_SERVICE);
         boolean active = !info.wifi.isWifiEnabled();
         info.wifi.setWifiEnabled(active);
-        return info.res.getString(R.string.output_wifi) + " " + Boolean.toString(active);
+        return info.res.getString(R.string.output_wifi) + " " + active;
     }
 
     @Override

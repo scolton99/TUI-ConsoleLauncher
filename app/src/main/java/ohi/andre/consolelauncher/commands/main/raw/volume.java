@@ -8,7 +8,8 @@ import android.os.Build;
 import android.provider.Settings;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand;
@@ -25,7 +26,7 @@ public class volume extends ParamCommand {
         set {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.INT, CommandAbstraction.INT};
+                return new int[] {Command.INT, Command.INT};
             }
 
             @Override
@@ -35,7 +36,7 @@ public class volume extends ParamCommand {
                     if (!mNotificationManager.isNotificationPolicyAccessGranted()) {
                         Intent intent = new Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
                         pack.context.startActivity(intent);
-                        return pack.context.getString(R.string.output_waitingpermission);
+                        return pack.context.getString(R.string.output_waiting_permissions);
                     }
                 }
 
@@ -63,7 +64,7 @@ public class volume extends ParamCommand {
         profile {
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.INT};
+                return new int[] {Command.INT};
             }
 
             @Override
@@ -74,7 +75,7 @@ public class volume extends ParamCommand {
                     if (!mNotificationManager.isNotificationPolicyAccessGranted()) {
                         Intent intent = new Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
                         pack.context.startActivity(intent);
-                        return pack.context.getString(R.string.output_waitingpermission);
+                        return pack.context.getString(R.string.output_waiting_permissions);
                     }
                 }
 
@@ -90,7 +91,7 @@ public class volume extends ParamCommand {
             }
         },
         get {
-            String[] labels = {"Voice call", "System", "Ring", "Media", "Alarm", "Notifications"};
+            final String[] labels = {"Voice call", "System", "Ring", "Media", "Alarm", "Notifications"};
 
             private void appendInfo(StringBuilder builder, AudioManager manager, int stream) {
                 builder.append(labels[stream]).append(":").append(Tuils.SPACE).append(manager.getStreamVolume(stream) * 100 / manager.getStreamMaxVolume(stream)).append("%").append(Tuils.NEWLINE);
@@ -98,7 +99,7 @@ public class volume extends ParamCommand {
 
             @Override
             public int[] args() {
-                return new int[] {CommandAbstraction.INT};
+                return new int[] {Command.INT};
             }
 
             @Override

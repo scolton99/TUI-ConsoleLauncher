@@ -3,7 +3,8 @@ package ohi.andre.consolelauncher.commands.tuixt.raw;
 import android.app.Activity;
 
 import ohi.andre.consolelauncher.R;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.tuixt.TuixtPack;
 
@@ -11,7 +12,7 @@ import ohi.andre.consolelauncher.commands.tuixt.TuixtPack;
  * Created by francescoandreuzzi on 24/01/2017.
  */
 
-public class exit implements CommandAbstraction {
+public class exit extends AbstractCommand {
 
     @Override
     public String exec(ExecutePack info) throws Exception {

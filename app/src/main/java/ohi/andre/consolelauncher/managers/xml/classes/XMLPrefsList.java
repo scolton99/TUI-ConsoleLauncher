@@ -11,7 +11,7 @@ import ohi.andre.consolelauncher.tuils.Tuils;
 
 public class XMLPrefsList {
 
-    public List<XMLPrefsEntry> list = new ArrayList<>();
+    public final List<XMLPrefsEntry> list = new ArrayList<>();
 
     public void add(XMLPrefsEntry entry) {
         list.add(entry);

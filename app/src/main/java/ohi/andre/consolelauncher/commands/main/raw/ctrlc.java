@@ -1,14 +1,15 @@
 package ohi.andre.consolelauncher.commands.main.raw;
 
 import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.io.File;
 
 import ohi.andre.consolelauncher.MainManager;
 import ohi.andre.consolelauncher.R;
 import ohi.andre.consolelauncher.UIManager;
-import ohi.andre.consolelauncher.commands.CommandAbstraction;
+import ohi.andre.consolelauncher.commands.AbstractCommand;
+import ohi.andre.consolelauncher.commands.Command;
 import ohi.andre.consolelauncher.commands.ExecutePack;
 import ohi.andre.consolelauncher.commands.main.MainPack;
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
@@ -19,7 +20,7 @@ import ohi.andre.consolelauncher.tuils.StoppableThread;
  * Created by francescoandreuzzi on 26/07/2017.
  */
 
-public class ctrlc implements CommandAbstraction {
+public class ctrlc extends AbstractCommand {
 
     @Override
     public String exec(final ExecutePack pack) throws Exception {
@@ -56,7 +57,7 @@ public class ctrlc implements CommandAbstraction {
 
     @Override
     public int helpRes() {
-        return R.string.help_ctrlc;
+        return R.string.help_ctrl_c;
     }
 
     @Override
