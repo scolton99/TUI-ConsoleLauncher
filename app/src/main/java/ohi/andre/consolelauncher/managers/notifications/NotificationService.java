@@ -38,7 +38,6 @@ import ohi.andre.consolelauncher.tuils.Tuils;
 /**
  * Created by francescoandreuzzi on 27/04/2017.
  */
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class NotificationService extends NotificationListenerService {
 
     public static final String DESTROY = "destroy";

@@ -298,32 +298,28 @@ public class LauncherActivity extends AppCompatActivity implements Reloadable {
 
         boolean notifications = XMLPrefsManager.getBoolean(Notifications.show_notifications) || XMLPrefsManager.get(Notifications.show_notifications).equalsIgnoreCase("enabled");
         if(notifications) {
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                try {
-                    ComponentName notificationComponent = new ComponentName(this, NotificationService.class);
-                    PackageManager pm = getPackageManager();
-                    pm.setComponentEnabledSetting(notificationComponent, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+            try {
+                ComponentName notificationComponent = new ComponentName(this, NotificationService.class);
+                PackageManager pm = getPackageManager();
+                pm.setComponentEnabledSetting(notificationComponent, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
 
-                    if (!Tuils.hasNotificationAccess(this)) {
-                        Intent i = new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
-                        if (i.resolveActivity(getPackageManager()) == null) {
-                            Toast.makeText(this, R.string.no_notification_access, Toast.LENGTH_LONG).show();
-                        } else {
-                            startActivity(i);
-                        }
+                if (!Tuils.hasNotificationAccess(this)) {
+                    Intent i = new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
+                    if (i.resolveActivity(getPackageManager()) == null) {
+                        Toast.makeText(this, R.string.no_notification_access, Toast.LENGTH_LONG).show();
+                    } else {
+                        startActivity(i);
                     }
-
-                    Intent monitor = new Intent(this, NotificationMonitorService.class);
-                    startService(monitor);
-
-                    Intent notificationIntent = new Intent(this, NotificationService.class);
-                    startService(notificationIntent);
-                } catch (NoClassDefFoundError er) {
-                    Intent intent = new Intent(PrivateIOReceiver.ACTION_OUTPUT);
-                    intent.putExtra(PrivateIOReceiver.TEXT, getString(R.string.output_notification_error) + Tuils.SPACE + er);
                 }
-            } else {
-                Tuils.sendOutput(Color.RED, this, R.string.notification_low_api);
+
+                Intent monitor = new Intent(this, NotificationMonitorService.class);
+                startService(monitor);
+
+                Intent notificationIntent = new Intent(this, NotificationService.class);
+                startService(notificationIntent);
+            } catch (NoClassDefFoundError er) {
+                Intent intent = new Intent(PrivateIOReceiver.ACTION_OUTPUT);
+                intent.putExtra(PrivateIOReceiver.TEXT, getString(R.string.output_notification_error) + Tuils.SPACE + er);
             }
         }
 

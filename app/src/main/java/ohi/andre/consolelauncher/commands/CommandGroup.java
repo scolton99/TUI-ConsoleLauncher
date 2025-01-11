@@ -67,7 +67,6 @@ public class CommandGroup {
         MAIN.register(alias.class);
         MAIN.register(apps.class);
         MAIN.register(beep.class);
-        MAIN.register(bluetooth.class);
         MAIN.register(brightness.class);
         MAIN.register(calc.class);
         MAIN.register(call.class);

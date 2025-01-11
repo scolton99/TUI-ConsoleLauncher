@@ -21,7 +21,6 @@ import ohi.andre.consolelauncher.tuils.Tuils;
  * Created by francescoandreuzzi on 24/03/2018.
  */
 
-@TargetApi(Build.VERSION_CODES.N_MR1)
 public class shortcut extends ParamCommand {
 
     private enum Param implements ohi.andre.consolelauncher.commands.main.Param {

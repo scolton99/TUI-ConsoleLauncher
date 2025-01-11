@@ -64,11 +64,7 @@ public class MusicManager2 implements MediaController.MediaPlayerControl {
         };
 
         String action;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            action = AudioManager.ACTION_HEADSET_PLUG;
-        } else {
-            action = Intent.ACTION_HEADSET_PLUG;
-        }
+        action = AudioManager.ACTION_HEADSET_PLUG;
 
         mContext.getApplicationContext().registerReceiver(headsetBroadcast, new IntentFilter(action));
 

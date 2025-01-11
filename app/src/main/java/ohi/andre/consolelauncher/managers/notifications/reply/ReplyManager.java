@@ -77,9 +77,6 @@ public class ReplyManager implements XMLPrefsElement {
     }
 
     public ReplyManager(Context context) {
-        enabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH;
-        if(!enabled) return;
-
         notificationWears = new HashSet<>();
         values = new XMLPrefsList();
         this.context = context;
@@ -218,7 +215,6 @@ public class ReplyManager implements XMLPrefsElement {
         nextUsableId = nextUsableId();
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     public void onNotification(StatusBarNotification notification, CharSequence text) {
         if(!enabled) return;
 
@@ -253,7 +249,6 @@ public class ReplyManager implements XMLPrefsElement {
         else Tuils.sendOutput(context, R.string.reply_notification_not_found);
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT_WATCH)
     private void replyTo(Context context, NotificationWear notificationWear, String what) {
         RemoteInput[] remoteInputs = notificationWear.remoteInputs;
 
@@ -270,7 +265,6 @@ public class ReplyManager implements XMLPrefsElement {
         LocalBroadcastManager.getInstance(context.getApplicationContext()).sendBroadcast(i);
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT_WATCH)
     private NotificationWear extractWearNotification(StatusBarNotification statusBarNotification) {
         NotificationWear notificationWear = new NotificationWear();
 

@@ -31,8 +31,7 @@ public enum Reply implements XMLPrefsSave {
 
     @Override
     public XMLPrefsElement parent() {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) return ReplyManager.instance;
-        else return null;
+        return ReplyManager.instance;
     }
 
     @Override

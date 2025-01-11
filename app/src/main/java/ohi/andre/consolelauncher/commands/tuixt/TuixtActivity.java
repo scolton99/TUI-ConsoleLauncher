@@ -6,12 +6,16 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
+import androidx.core.content.IntentSanitizer;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
 import android.text.InputType;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -29,7 +33,6 @@ import java.io.FileReader;
 import ohi.andre.consolelauncher.R;
 import ohi.andre.consolelauncher.commands.CommandInvocation;
 import ohi.andre.consolelauncher.commands.CommandGroup;
-import ohi.andre.consolelauncher.commands.CommandTuils;
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
 import ohi.andre.consolelauncher.managers.xml.options.Theme;
 import ohi.andre.consolelauncher.managers.xml.options.Ui;
@@ -41,8 +44,6 @@ import ohi.andre.consolelauncher.tuils.Tuils;
  */
 
 public class TuixtActivity extends Activity {
-
-    private final String FIRSTACCESS_KEY = "firstAccess";
 
     public static final int BACK_PRESSED = 2;
 
@@ -64,13 +65,26 @@ public class TuixtActivity extends Activity {
 
         final LinearLayout rootView = new LinearLayout(this);
 
-        final Intent intent = getIntent();
+        final Intent intent = new IntentSanitizer.Builder()
+                .allowExtra(PATH, String.class)
+                .allowComponent(getComponentName())
+                .allowData(uri -> "file".equals(uri.getScheme()))
+                .build()
+                .sanitizeByFiltering(getIntent());
 
         String path = intent.getStringExtra(PATH);
         if(path == null) {
-            Uri uri = intent.getData();
-            File file = new File(uri.getPath());
-            path = file.getAbsolutePath();
+            if (intent.getData() != null && intent.getData().getPath() != null){
+                Uri uri = intent.getData();
+                File file = new File(uri.getPath());
+                path = file.getAbsolutePath();
+            } else {
+                Log.w(Tuils.LOG_TAG, "TUIXT: no file specified");
+                intent.putExtra(ERROR_KEY, "No file specified");
+                setResult(1, intent);
+                finish();
+                return;
+            }
         }
 
         final File file = new File(path);
@@ -87,7 +101,7 @@ public class TuixtActivity extends Activity {
             Window window = getWindow();
 
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(getColor(R.color.half_translucent));
             window.setStatusBarColor(XMLPrefsManager.getColor(Theme.statusbar_color));
             window.setNavigationBarColor(XMLPrefsManager.getColor(Theme.navigationbar_color));
         }
@@ -106,13 +120,13 @@ public class TuixtActivity extends Activity {
         View inputOutputView = inflater.inflate(layoutId, null);
         rootView.addView(inputOutputView);
 
-        fileView = (EditText) inputOutputView.findViewById(R.id.file_view);
-        inputView = (EditText) inputOutputView.findViewById(R.id.input_view);
-        outputView = (TextView) inputOutputView.findViewById(R.id.output_view);
+        fileView = inputOutputView.findViewById(R.id.file_view);
+        inputView = inputOutputView.findViewById(R.id.input_view);
+        outputView = inputOutputView.findViewById(R.id.output_view);
 
-        TextView prefixView = (TextView) inputOutputView.findViewById(R.id.prefix_view);
+        TextView prefixView = inputOutputView.findViewById(R.id.prefix_view);
 
-        ImageButton submitView = (ImageButton) inputOutputView.findViewById(R.id.submit_tv);
+        ImageButton submitView = inputOutputView.findViewById(R.id.submit_tv);
         boolean showSubmit = XMLPrefsManager.getBoolean(Ui.show_enter_button);
         if (!showSubmit) {
             submitView.setVisibility(View.GONE);
@@ -138,13 +152,12 @@ public class TuixtActivity extends Activity {
         fileView.setTypeface(Tuils.getTypeface(this));
         fileView.setTextSize(ioSize);
         fileView.setTextColor(outputColor);
-        fileView.setOnTouchListener((v, event) -> {
-            if(event.getAction() == MotionEvent.ACTION_DOWN) {
-                outputView.setVisibility(View.GONE);
-                outputView.setText(Tuils.EMPTY_STRING);
-            }
+        fileView.setOnFocusChangeListener((view, hasFocus) -> {
+            if (!hasFocus)
+                return;
 
-            return false;
+            outputView.setVisibility(View.GONE);
+            outputView.setText(Tuils.EMPTY_STRING);
         });
 
         outputView.setTypeface(Tuils.getTypeface(this));
@@ -187,7 +200,7 @@ public class TuixtActivity extends Activity {
 
         pack = new TuixtPack(group, file, this, fileView);
 
-        fileView.setText(getString(R.string.tuixt_reading) + Tuils.SPACE + path);
+        fileView.setText(getString(R.string.tuixt_reading, path));
         new StoppableThread() {
 
             @Override
@@ -231,16 +244,31 @@ public class TuixtActivity extends Activity {
             }
         }.start();
 
-        SharedPreferences preferences = getPreferences(0);
-        boolean firstAccess = preferences.getBoolean(FIRSTACCESS_KEY, true);
+        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        String FIRST_ACCESS_KEY = "firstAccess";
+        boolean firstAccess = preferences.getBoolean(FIRST_ACCESS_KEY, true);
         if (firstAccess) {
             SharedPreferences.Editor editor = preferences.edit();
-            editor.putBoolean(FIRSTACCESS_KEY, false);
-            editor.commit();
+            editor.putBoolean(FIRST_ACCESS_KEY, false);
+            editor.apply();
 
-            inputView.setText("help");
+            inputView.setText(R.string.tuixt_help);
             inputView.setSelection(inputView.getText().length());
         }
+
+        ViewCompat.setOnApplyWindowInsetsListener(inputOutputView, (view, insets) -> {
+            LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) view.getLayoutParams();
+
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
+
+            lp.topMargin = systemBars.top;
+            lp.bottomMargin = Math.max(systemBars.bottom, ime.bottom);
+
+            view.setLayoutParams(lp);
+
+            return insets;
+        });
     }
 
     @Override

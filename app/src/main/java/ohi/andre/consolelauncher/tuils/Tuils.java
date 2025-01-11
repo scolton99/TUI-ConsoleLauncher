@@ -410,7 +410,6 @@ public class Tuils {
         packageManager.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_DEFAULT, PackageManager.DONT_KILL_APP);
     }
 
-    @TargetApi(Build.VERSION_CODES.GINGERBREAD)
     public static void openSettingsPage(Context c, String packageName) {
         Intent intent = new Intent();
         intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
@@ -1372,12 +1371,7 @@ public class Tuils {
 
     private static Uri buildFile(Context context, File file) {
         Uri uri;
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            uri = Uri.fromFile(file);
-        }
-        else {
-            uri = FileProvider.getUriForFile(context, GenericFileProvider.PROVIDER_NAME, file);
-        }
+        uri = FileProvider.getUriForFile(context, GenericFileProvider.PROVIDER_NAME, file);
         return uri;
     }
 
@@ -1465,14 +1459,9 @@ public class Tuils {
 
     public static String getTextFromClipboard(Context context) {
         try {
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-                ClipboardManager manager = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData.Item item = manager.getPrimaryClip().getItemAt(0);
-                return item.getText().toString();
-            } else {
-                android.text.ClipboardManager manager = (android.text.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                return manager.getText().toString();
-            }
+            ClipboardManager manager = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData.Item item = manager.getPrimaryClip().getItemAt(0);
+            return item.getText().toString();
         } catch (Exception e) {
             return null;
         }
@@ -1563,26 +1552,6 @@ public class Tuils {
             default:
                 return "unknown";
         }
-    }
-
-    public static void setCursorDrawableColor(EditText editText, int color) {
-        try {
-            Field fCursorDrawableRes = TextView.class.getDeclaredField("mCursorDrawableRes");
-            fCursorDrawableRes.setAccessible(true);
-            int mCursorDrawableRes = fCursorDrawableRes.getInt(editText);
-            Field fEditor = TextView.class.getDeclaredField("mEditor");
-            fEditor.setAccessible(true);
-            Object editor = fEditor.get(editText);
-            Class<?> clazz = editor.getClass();
-            Field fCursorDrawable = clazz.getDeclaredField("mCursorDrawable");
-            fCursorDrawable.setAccessible(true);
-            Drawable[] drawables = new Drawable[2];
-            drawables[0] = editText.getContext().getResources().getDrawable(mCursorDrawableRes);
-            drawables[1] = editText.getContext().getResources().getDrawable(mCursorDrawableRes);
-            drawables[0].setColorFilter(color, PorterDuff.Mode.SRC_IN);
-            drawables[1].setColorFilter(color, PorterDuff.Mode.SRC_IN);
-            fCursorDrawable.set(editor, drawables);
-        } catch (Throwable ignored) {}
     }
 
     public static int nOfBytes(File file) {
