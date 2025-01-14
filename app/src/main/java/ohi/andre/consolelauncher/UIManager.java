@@ -75,6 +75,7 @@ import ohi.andre.consolelauncher.managers.xml.options.Ui;
 import ohi.andre.consolelauncher.tuils.AllowEqualsSequence;
 import ohi.andre.consolelauncher.tuils.NetworkUtils;
 import ohi.andre.consolelauncher.tuils.OutlineTextView;
+import ohi.andre.consolelauncher.tuils.TerminalScrollView;
 import ohi.andre.consolelauncher.tuils.Tuils;
 import ohi.andre.consolelauncher.tuils.interfaces.CommandExecuter;
 import ohi.andre.consolelauncher.tuils.interfaces.OnBatteryUpdate;
@@ -812,6 +813,9 @@ public class UIManager implements OnTouchListener {
                 return insets;
             }
         });
+
+        TerminalScrollView view = rootView.findViewById(R.id.scroll_view);
+        view.setLineHeight(terminalView.getLineHeight());
 
 //        scrolllllll
         if (XMLPrefsManager.getBoolean(Behavior.auto_scroll)) {
