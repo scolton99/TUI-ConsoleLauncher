@@ -133,29 +133,16 @@
         android:layout_above="@id/input_group"
 
         android:fillViewport="true"
-        android:id="@+id/scroll_view">
+        android:id="@+id/scroll_view"
+        android:gravity="bottom">
 
-        <LinearLayout
+        <ohi.andre.consolelauncher.tuils.OutlineTextView
+            android:id="@+id/terminal_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
-            android:orientation="vertical">
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <ohi.andre.consolelauncher.tuils.OutlineTextView
-                android:id="@+id/terminal_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-
-                android:contentDescription="@string/terminal_content_description"
-                android:gravity="bottom"
-                android:textIsSelectable="true" />
-
-        </LinearLayout>
+            android:contentDescription="@string/terminal_content_description"
+            android:textIsSelectable="true" />
 
     </ohi.andre.consolelauncher.tuils.TerminalScrollView>
 
