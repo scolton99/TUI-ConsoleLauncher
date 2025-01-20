@@ -1,10 +1,9 @@
 package ohi.andre.consolelauncher.tuils;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
+import android.view.MotionEvent;
 import android.widget.ScrollView;
 
 public class TerminalScrollView extends ScrollView {
@@ -12,24 +11,14 @@ public class TerminalScrollView extends ScrollView {
 
     private boolean isSnapping = false;
     private int lastRem = 0;
+    private boolean isBeingTouched = false;
 
     public TerminalScrollView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public TerminalScrollView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-    }
-
     public void setLineHeight(int lineHeight) {
         this.lineHeight = lineHeight;
-    }
-
-    @Override
-    public void scrollTo(int x, int y) {
-        isSnapping = true;
-        super.scrollTo(x, y);
-        isSnapping = false;
     }
 
     @Override
@@ -39,32 +28,83 @@ public class TerminalScrollView extends ScrollView {
         super.onSizeChanged(w, h, oldw, oldh);
     }
 
-    /**
-     *
-     * @param l Current horizontal scroll origin.
-     * @param t Current vertical scroll origin.
-     * @param oldl Previous horizontal scroll origin.
-     * @param oldt Previous vertical scroll origin.
-     */
+    @Override
+    public void scrollTo(int x, int y) {
+        this.isSnapping = true;
+        super.scrollTo(x, y);
+        this.isSnapping = false;
+    }
+
     @Override
     protected void onScrollChanged(int l, int t, int oldl, int oldt) {
-        super.onScrollChanged(l, t, oldl, oldt);
-        if (isSnapping)
+        if (this.isSnapping)
             return;
 
-        // Round to a multiple of lineHeight
-        // TODO: should this be a floor? A ceil? A round?
-        int newHeight = (t / this.lineHeight) * this.lineHeight;
+        this.scrollTo(l, getNewScrollY(t));
 
-        // The user tried to scroll further in one direction -- probably. How much did we cut them off?
-        // Have to remember this so that if the scrolling is slow -- think 1px per call of this function,
-        // we still get a snap to the next line eventually...
-        int rem = t - newHeight;
-        int cumulativeRem = rem + lastRem;
-
-        newHeight += (cumulativeRem / this.lineHeight) * this.lineHeight;
-        this.lastRem = cumulativeRem % this.lineHeight;
-
-        this.scrollTo(l, newHeight);
+        super.onScrollChanged(l, t, oldl, oldt);
     }
+
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN: {
+                this.isBeingTouched = true;
+                break;
+            }
+            case MotionEvent.ACTION_UP: {
+                this.isBeingTouched = false;
+                break;
+            }
+        }
+
+        return super.onInterceptTouchEvent(ev);
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN: {
+                this.isBeingTouched = true;
+                break;
+            }
+            case MotionEvent.ACTION_UP: {
+                this.isBeingTouched = false;
+                break;
+            }
+        }
+
+        return super.onTouchEvent(ev);
+    }
+
+    private int prevFixedScrollY = 0;
+    private int getNewScrollY(int scrollY) {
+        // Round to a multiple of lineHeight
+        int newHeight = Math.round((float) scrollY / this.lineHeight) * this.lineHeight;
+
+        if (newHeight == this.prevFixedScrollY && scrollY != newHeight && isBeingTouched) {
+            // We're moving within one line...keep track of movement without actually scrolling.
+            int rem = scrollY - newHeight;
+            this.lastRem += rem;
+
+            int incLines = this.lastRem / this.lineHeight;
+
+            // Add a line (or more) to the new height based on the rem calculation
+            // scrollY < prevY ? We're scrolling UP -- only DECREASE lines. don't snap the other way
+            // vice versa for scrollY > prevY
+            int add = incLines * this.lineHeight;
+            newHeight += add;
+        }
+
+        if (newHeight != this.prevFixedScrollY) {
+            // We've switched lines either by scrollY itself or with rem -- time to reset rem
+            this.lastRem = 0;
+        }
+
+        this.prevFixedScrollY = newHeight;
+        return newHeight;
+    }
+
+
 }
