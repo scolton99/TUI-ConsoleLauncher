@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.tuils;
 
+import android.app.ActivityOptions;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -106,7 +107,10 @@ public class LongClickableSpan extends ClickableSpan {
             PendingIntent pi = (PendingIntent) o;
 
             try {
-                pi.send();
+                ActivityOptions opts = ActivityOptions.makeBasic();
+                opts.setPendingIntentBackgroundActivityStartMode(ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED);
+                 pi.send(opts.toBundle());
+//                v.getContext().startActivity(v.getContext().getPackageManager().getLaunchIntentForPackage("com.google.android.apps.messaging"));
             } catch (PendingIntent.CanceledException e) {
                 Tuils.log(e);
             }

@@ -80,8 +80,11 @@ public class TerminalScrollView extends ScrollView {
 
     private int prevFixedScrollY = 0;
     private int getNewScrollY(int scrollY) {
+        int scrollHeight = this.getChildAt(0).getHeight() - this.getHeight();
+        int inverseScroll = scrollHeight - scrollY;
+
         // Round to a multiple of lineHeight
-        int newHeight = Math.round((float) scrollY / this.lineHeight) * this.lineHeight;
+        int newHeight = scrollHeight - (Math.round((float) inverseScroll / this.lineHeight) * this.lineHeight);
 
         if (newHeight == this.prevFixedScrollY && scrollY != newHeight && isBeingTouched) {
             // We're moving within one line...keep track of movement without actually scrolling.

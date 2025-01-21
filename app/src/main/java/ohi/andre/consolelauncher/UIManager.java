@@ -31,6 +31,7 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.animation.LinearInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
@@ -43,10 +44,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GestureDetectorCompat;
+import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsAnimationCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.viewpager.widget.ViewPager;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -67,6 +70,7 @@ import ohi.andre.consolelauncher.managers.TuiLocationManager;
 import ohi.andre.consolelauncher.managers.suggestions.SuggestionTextWatcher;
 import ohi.andre.consolelauncher.managers.suggestions.SuggestionsManager;
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager;
+import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave;
 import ohi.andre.consolelauncher.managers.xml.options.Behavior;
 import ohi.andre.consolelauncher.managers.xml.options.Suggestions;
 import ohi.andre.consolelauncher.managers.xml.options.Theme;
@@ -570,7 +574,17 @@ public class UIManager implements OnTouchListener {
 
                 if (count == labelIndexes[Label.weather.ordinal()]) {
                     labelViews[count].setOnTouchListener((view, motionEvent) -> {
-                        Intent intent = context.getPackageManager().getLaunchIntentForPackage("com.google.android.apps.weather");
+                        if (motionEvent.getAction() != MotionEvent.ACTION_DOWN)
+                            return false;
+
+                        String packageName = XMLPrefsManager.get(Behavior.weather_app);
+                        Intent intent = context.getPackageManager().getLaunchIntentForPackage(packageName);
+
+                        if (intent == null) {
+                            Tuils.sendOutput(Color.RED, context, "Couldn't find the weather app specified.");
+                            return true;
+                        }
+
                         context.startActivity(intent);
                         return true;
                     });
@@ -791,7 +805,38 @@ public class UIManager implements OnTouchListener {
 
         mTerminalAdapter = new TerminalManager(terminalView, inputView, prefixView, submitView, backView, nextView, deleteView, pasteView, context, mainPack, executer);
 
+        ViewCompat.setOnApplyWindowInsetsListener(rootView.findViewById(R.id.input_down_layout), (view, insets) -> {
+            Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+
+            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) rootView.findViewById(R.id.input_down_layout).getLayoutParams();
+            params.bottomMargin = Math.max(bars.bottom, ime.bottom);
+            rootView.findViewById(R.id.input_down_layout).setLayoutParams(params);
+
+            return insets;
+        });
+
         ViewCompat.setWindowInsetsAnimationCallback(rootView.findViewById(R.id.input_down_layout), new WindowInsetsAnimationCompat.Callback(WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP) {
+            private int startBottom = 0;
+            private int finalBottom = 0;
+            private final View inputDownLayout = rootView.findViewById(R.id.input_down_layout);
+
+            @Override
+            public void onPrepare(@NonNull WindowInsetsAnimationCompat animation) {
+                ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) this.inputDownLayout.getLayoutParams();
+                this.startBottom = layoutParams.bottomMargin;
+            }
+
+            @NonNull
+            @Override
+            public WindowInsetsAnimationCompat.BoundsCompat onStart(@NonNull WindowInsetsAnimationCompat animation, @NonNull WindowInsetsAnimationCompat.BoundsCompat bounds) {
+                ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) this.inputDownLayout.getLayoutParams();
+                this.finalBottom = layoutParams.bottomMargin;
+                layoutParams.bottomMargin = this.startBottom;
+                this.inputDownLayout.setLayoutParams(layoutParams);
+                return bounds;
+            }
+
             @NonNull
             @Override
             public WindowInsetsCompat onProgress(@NonNull WindowInsetsCompat insets, @NonNull List<WindowInsetsAnimationCompat> runningAnimations) {
@@ -803,12 +848,10 @@ public class UIManager implements OnTouchListener {
                     }
                 }
                 if (imeAnimation != null) {
-                    Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
-                    Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) rootView.findViewById(R.id.input_down_layout).getLayoutParams();
-                    mTerminalAdapter.scrollToEndImmediate();
-                    params.bottomMargin = Math.max(bars.bottom, ime.bottom);
-                    rootView.findViewById(R.id.input_down_layout).setLayoutParams(params);
+                    ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) this.inputDownLayout.getLayoutParams();
+                    layoutParams.bottomMargin = (int) ((1 - imeAnimation.getInterpolatedFraction()) * this.startBottom + imeAnimation.getInterpolatedFraction() * this.finalBottom);
+                    this.inputDownLayout.setLayoutParams(layoutParams);
+                    terminalView.scrollTo(0, Integer.MAX_VALUE);
                 }
                 return insets;
             }
@@ -1724,11 +1767,11 @@ public class UIManager implements OnTouchListener {
         }
 
         private void setUrl(String where) {
-            url = "http://api.openweathermap.org/data/2.5/weather?" + where + "&appid=" + key + "&units=" + XMLPrefsManager.get(Behavior.weather_temperature_measure);
+            url = "https://api.openweathermap.org/data/2.5/weather?" + where + "&appid=" + key + "&units=" + XMLPrefsManager.get(Behavior.weather_temperature_measure);
         }
 
         private void setUrl(double latitude, double longitude) {
-            url = "http://api.openweathermap.org/data/2.5/weather?" + "lat=" + latitude + "&lon=" + longitude + "&appid=" + key + "&units=" + XMLPrefsManager.get(Behavior.weather_temperature_measure);
+            url = "https://api.openweathermap.org/data/2.5/weather?" + "lat=" + latitude + "&lon=" + longitude + "&appid=" + key + "&units=" + XMLPrefsManager.get(Behavior.weather_temperature_measure);
         }
     }
 }

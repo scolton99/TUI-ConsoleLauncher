@@ -1045,6 +1045,20 @@ public enum Behavior implements XMLPrefsSave {
             return XMLPrefsSave.TEXT;
         }
     },
+    weather_app {
+        @Override
+        public String defaultValue() { return "com.google.android.apps.weather"; }
+
+        @Override
+        public String info() {
+            return "The package name of the weather app to open when tapping the weather information.";
+        }
+
+        @Override
+        public String type() {
+            return XMLPrefsSave.TEXT;
+        }
+    },
     clear_on_lock {
         @Override
         public String defaultValue() {

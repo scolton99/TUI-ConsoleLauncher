@@ -248,7 +248,7 @@ public class NotificationService extends NotificationListenerService {
                             }
 
 //                        Tuils.log("text", text);
-//                        Tuils.log("--------");
+//                        Tuils.log("-----6---");
 
                             Tuils.sendOutput(NotificationService.this.getApplicationContext(), s, TerminalManager.CATEGORY_NO_COLOR, click ? notification.contentIntent : null, longClick ? n : null);
 
