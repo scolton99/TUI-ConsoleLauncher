@@ -816,46 +816,56 @@ public class UIManager implements OnTouchListener {
             return insets;
         });
 
-        ViewCompat.setWindowInsetsAnimationCallback(rootView.findViewById(R.id.input_down_layout), new WindowInsetsAnimationCompat.Callback(WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP) {
-            private int startBottom = 0;
-            private int finalBottom = 0;
-            private final View inputDownLayout = rootView.findViewById(R.id.input_down_layout);
-
-            @Override
-            public void onPrepare(@NonNull WindowInsetsAnimationCompat animation) {
-                ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) this.inputDownLayout.getLayoutParams();
-                this.startBottom = layoutParams.bottomMargin;
-            }
-
-            @NonNull
-            @Override
-            public WindowInsetsAnimationCompat.BoundsCompat onStart(@NonNull WindowInsetsAnimationCompat animation, @NonNull WindowInsetsAnimationCompat.BoundsCompat bounds) {
-                ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) this.inputDownLayout.getLayoutParams();
-                this.finalBottom = layoutParams.bottomMargin;
-                layoutParams.bottomMargin = this.startBottom;
-                this.inputDownLayout.setLayoutParams(layoutParams);
-                return bounds;
-            }
-
-            @NonNull
-            @Override
-            public WindowInsetsCompat onProgress(@NonNull WindowInsetsCompat insets, @NonNull List<WindowInsetsAnimationCompat> runningAnimations) {
-                WindowInsetsAnimationCompat imeAnimation = null;
-                for (WindowInsetsAnimationCompat animation : runningAnimations) {
-                    if ((animation.getTypeMask() & WindowInsetsCompat.Type.ime()) != 0) {
-                        imeAnimation = animation;
-                        break;
-                    }
-                }
-                if (imeAnimation != null) {
-                    ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) this.inputDownLayout.getLayoutParams();
-                    layoutParams.bottomMargin = (int) ((1 - imeAnimation.getInterpolatedFraction()) * this.startBottom + imeAnimation.getInterpolatedFraction() * this.finalBottom);
-                    this.inputDownLayout.setLayoutParams(layoutParams);
-                    terminalView.scrollTo(0, Integer.MAX_VALUE);
-                }
-                return insets;
-            }
-        });
+        // TODO: fix this animation!!
+//        ViewCompat.setWindowInsetsAnimationCallback(rootView.findViewById(R.id.input_down_layout), new WindowInsetsAnimationCompat.Callback(WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP) {
+//            private int startHeight = 0;
+//            private int finalHeight = 0;
+//            private final View inputDownLayout = rootView.findViewById(R.id.input_down_layout);
+//
+//            @Override
+//            public void onPrepare(@NonNull WindowInsetsAnimationCompat animation) {
+//                this.startHeight = this.inputDownLayout.getHeight();
+//            }
+//
+//            @NonNull
+//            @Override
+//            public WindowInsetsAnimationCompat.BoundsCompat onStart(@NonNull WindowInsetsAnimationCompat animation, @NonNull WindowInsetsAnimationCompat.BoundsCompat bounds) {
+//                this.finalHeight = this.inputDownLayout.getHeight();
+//                return bounds;
+//            }
+//
+//            @NonNull
+//            @Override
+//            public WindowInsetsCompat onProgress(@NonNull WindowInsetsCompat insets, @NonNull List<WindowInsetsAnimationCompat> runningAnimations) {
+//                WindowInsetsAnimationCompat imeAnimation = null;
+//                for (WindowInsetsAnimationCompat animation : runningAnimations) {
+//                    if ((animation.getTypeMask() & WindowInsetsCompat.Type.ime()) != 0) {
+//                        imeAnimation = animation;
+//                        break;
+//                    }
+//                }
+//                if (imeAnimation != null) {
+//                    float pct = imeAnimation.getInterpolatedFraction();
+//
+//                    int currentHeight = (int) (this.startHeight + (this.finalHeight - this.startHeight) * pct);
+//                    int translateY = currentHeight - finalHeight;
+//
+//                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) this.inputDownLayout.getLayoutParams();
+//                    params.height = currentHeight;
+//                    this.inputDownLayout.setLayoutParams(params);
+//
+////                    this.inputDownLayout.setTranslationY(translateY);
+//                }
+//                return insets;
+//            }
+//
+//            @Override
+//            public void onEnd(@NonNull WindowInsetsAnimationCompat animation) {
+//                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) this.inputDownLayout.getLayoutParams();
+//                params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+//                this.inputDownLayout.setLayoutParams(params);
+//            }
+//        });
 
         TerminalScrollView view = rootView.findViewById(R.id.scroll_view);
         view.setLineHeight(terminalView.getLineHeight());

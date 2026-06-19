@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 android {
     defaultConfig {
-        applicationId "ohi.andre.consolelauncher"
+        applicationId "ohi.andre.consolelauncher.beta"
 
         compileSdk = 35
         minSdkVersion 30
