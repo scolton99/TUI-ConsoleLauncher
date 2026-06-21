@@ -23,8 +23,10 @@ import org.xml.sax.SAXParseException;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import ohi.andre.consolelauncher.BuildConfig;
@@ -186,7 +188,7 @@ public class ReplyManager implements XMLPrefsElement {
                     try {
                         info = mgr.getApplicationInfo(nn, 0);
                     } catch (Exception e) {
-                        Tuils.log(e);
+                        Tuils.log("Reply application not installed: " + nn, e);
                         continue;
                     }
 
@@ -271,7 +273,7 @@ public class ReplyManager implements XMLPrefsElement {
         Notification.WearableExtender wearableExtender = new Notification.WearableExtender(statusBarNotification.getNotification());
 
         List<Notification.Action> allActions = new ArrayList<>();
-        allActions.addAll(Arrays.asList(statusBarNotification.getNotification().actions));
+        allActions.addAll(Objects.requireNonNullElse(Arrays.asList(statusBarNotification.getNotification().actions), Collections.emptyList()));
         allActions.addAll(wearableExtender.getActions());
 
         for(Notification.Action action : allActions) {
