@@ -273,7 +273,7 @@ public class ReplyManager implements XMLPrefsElement {
         Notification.WearableExtender wearableExtender = new Notification.WearableExtender(statusBarNotification.getNotification());
 
         List<Notification.Action> allActions = new ArrayList<>();
-        allActions.addAll(Objects.requireNonNullElse(Arrays.asList(statusBarNotification.getNotification().actions), Collections.emptyList()));
+        allActions.addAll(Arrays.asList(Objects.requireNonNullElseGet(statusBarNotification.getNotification().actions, () -> new Notification.Action[]{})));
         allActions.addAll(wearableExtender.getActions());
 
         for(Notification.Action action : allActions) {
