@@ -106,6 +106,7 @@ public class CommandGroup {
         MAIN.register(tuixt.class);
         MAIN.register(tutorial.class);
         MAIN.register(uninstall.class);
+        MAIN.register(version.class);
         MAIN.register(vibrate.class);
         MAIN.register(volume.class);
         MAIN.register(wifi.class);

@@ -8,7 +8,7 @@ android {
         targetSdkVersion 35
         flavorDimensions = ["default"]
 
-        versionName "v6.15-0SCbeta"
+        versionName "v6.16"
         versionCode 205
     }
     buildTypes {
